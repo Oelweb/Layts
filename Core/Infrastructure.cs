@@ -62,6 +62,21 @@ public sealed class AppSettings
     /// <summary>Beim Start automatisch nach Updates suchen.</summary>
     public bool AutoUpdate { get; set; } = true;
 
+    /// <summary>Back up a save automatically before layts writes it.</summary>
+    public bool AutoBackup { get; set; } = true;
+
+    /// <summary>At most one automatic backup per this many minutes (0 = before every save).</summary>
+    public int BackupIntervalMinutes { get; set; } = 15;
+
+    /// <summary>How many backups are kept per save (older ones are deleted).</summary>
+    public int BackupKeep { get; set; } = 10;
+
+    /// <summary>Game ids with automatic backups turned off.</summary>
+    public List<string> BackupDisabledGames { get; set; } = new();
+
+    /// <summary>The settings instance the app uses (set by <see cref="Load"/>).</summary>
+    public static AppSettings Current { get; private set; } = new();
+
     public static string DataDirectory =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Layts");
 
@@ -72,13 +87,13 @@ public sealed class AppSettings
         try
         {
             if (File.Exists(FilePath))
-                return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(FilePath)) ?? new AppSettings();
+                return Current = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(FilePath)) ?? new AppSettings();
         }
         catch
         {
             // Defekte Einstellungen ignorieren – es wird mit Standardwerten gestartet.
         }
-        return new AppSettings();
+        return Current = new AppSettings();
     }
 
     public void Save()

@@ -531,6 +531,7 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
         bool upgrade = UpgradeGarages, buyAll = BuyAllGarages;
         var busSkills = BusSkills.Where(s => s.IsAvailable).ToDictionary(s => s.Key, s => s.Value);
         bool discoverStops = coaches && DiscoverBusStops;
+        bool backup = ShouldBackupNow();
 
         IsBusy = true;
         ClearStatus();
@@ -538,7 +539,7 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
         {
             var summary = await Task.Run(() =>
             {
-                Ets2Backups.Create(slot);
+                if (backup) Ets2Backups.Create(slot);
 
                 var lines = new List<string>();
                 save.Money = money;
@@ -569,7 +570,7 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
             await LoadSaveAsync();
             var details = summary.Count > 0 ? " " + string.Join(" · ", summary) + "." : "";
             ShowStatus(StatusKind.Success,
-                Loc.F("Msg_Saved", details));
+                Loc.F(backup ? "Msg_Saved" : "Msg_SavedNoBackup", details));
             _ = FlashSavedAsync();
         }
         catch (Exception ex)
@@ -639,6 +640,43 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
             // Explorer nicht verfügbar – ignorieren.
         }
     }
+
+    // ---------- Backup options ----------
+
+    private const string BackupGameId = "ets2";
+
+    /// <summary>Automatic backups for this game (the global switch is in Settings).</summary>
+    public bool AutoBackupThisGame
+    {
+        get => BackupPolicy.IsGameEnabled(BackupGameId);
+        set
+        {
+            if (value == AutoBackupThisGame) return;
+            BackupPolicy.SetGameEnabled(BackupGameId, value);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(BackupHint));
+        }
+    }
+
+    public bool IsGlobalBackupOff => !AppSettings.Current.AutoBackup;
+    public string BackupHint => BackupPolicy.Hint(BackupGameId);
+
+    private ICommand? _backupNowCommand;
+    public ICommand BackupNowCommand => _backupNowCommand ??= new RelayCommand(async () =>
+    {
+        try
+        {
+            await Task.Run(() => Ets2Backups.Create(SelectedSave!));
+            LoadBackups();
+            ShowStatus(StatusKind.Success, Loc.Get("Bk_Created"));
+        }
+        catch (Exception ex)
+        {
+            ShowStatus(StatusKind.Error, Loc.F("Err_Save", ex.Message));
+        }
+    }, () => SelectedSave != null && !IsBusy);
+
+    private bool ShouldBackupNow() => BackupPolicy.ShouldBackup(BackupGameId, SelectedSave == null ? null : Ets2Backups.List(SelectedSave).FirstOrDefault()?.Created);
 
     public void Dispose() => _timer.Stop();
 }

@@ -17,7 +17,6 @@ public sealed class BackupEntry
 /// <summary>Sicherungen liegen unter %LOCALAPPDATA%\Layts\Backups\ETS2 – nie im Spielordner.</summary>
 public static class Ets2Backups
 {
-    private const int MaxBackupsPerSave = 25;
     private static readonly string[] SaveFiles = { "game.sii", "info.sii" };
 
     public static string Root => Path.Combine(AppSettings.DataDirectory, "Backups", "ETS2");
@@ -44,7 +43,7 @@ public static class Ets2Backups
         }
         File.WriteAllText(Path.Combine(dir, "quelle.txt"), slot.FolderPath);
 
-        Prune(slot);
+        BackupPolicy.Prune(DirectoryFor(slot));
         return new BackupEntry { FolderPath = dir, Created = DateTime.Now, Size = size };
     }
 
@@ -76,12 +75,4 @@ public static class Ets2Backups
         }
     }
 
-    private static void Prune(Ets2SaveSlot slot)
-    {
-        foreach (var old in List(slot).Skip(MaxBackupsPerSave))
-        {
-            try { Directory.Delete(old.FolderPath, recursive: true); }
-            catch { /* nicht kritisch */ }
-        }
-    }
 }

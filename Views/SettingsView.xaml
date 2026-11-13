@@ -234,7 +234,80 @@
             <Border Style="{StaticResource Card}">
                 <StackPanel>
                     <Border Style="{StaticResource CardHeader}">
-                        <TextBlock Text="{core:Tr TabBackups}" Style="{StaticResource H2}"/>
+                        <StackPanel>
+                            <TextBlock Text="{core:Tr TabBackups}" Style="{StaticResource H2}"/>
+                            <TextBlock Text="{core:Tr Bk_Desc}" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Row}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,24,0">
+                                <TextBlock Text="{core:Tr Bk_Auto}" Style="{StaticResource RowTitle}"/>
+                                <TextBlock Text="{core:Tr Bk_AutoDesc}" Style="{StaticResource Caption}"/>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" IsChecked="{Binding AutoBackup}"/>
+                        </Grid>
+                    </Border>
+                    <StackPanel IsEnabled="{Binding AutoBackup}">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.45"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <Border Style="{StaticResource Row}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,24,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{core:Tr Bk_Interval}" Style="{StaticResource RowTitle}"/>
+                                    <TextBlock Text="{core:Tr Bk_IntervalDesc}" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ComboBox Grid.Column="1" Width="220" ItemsSource="{Binding IntervalOptions}" SelectedIndex="{Binding IntervalIndex}"/>
+                            </Grid>
+                        </Border>
+                        <Border Style="{StaticResource Row}">
+                            <StackPanel>
+                                <TextBlock Text="{core:Tr Bk_PerGame}" Style="{StaticResource RowTitle}"/>
+                                <TextBlock Text="{core:Tr Bk_PerGameDesc}" Style="{StaticResource Caption}" Margin="0,0,0,10"/>
+                                <ItemsControl ItemsSource="{Binding GameBackups}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontSize="13.5"/>
+                                                <CheckBox Grid.Column="1" IsChecked="{Binding IsOn}"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                    <Border Style="{StaticResource Row}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,24,0" VerticalAlignment="Center">
+                                <TextBlock Text="{core:Tr Bk_Keep}" Style="{StaticResource RowTitle}"/>
+                                <TextBlock Text="{core:Tr Bk_KeepDesc}" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Width="220" ItemsSource="{Binding KeepOptions}" SelectedIndex="{Binding KeepIndex}"/>
+                        </Grid>
                     </Border>
                     <Border Style="{StaticResource RowLast}">
                         <Grid>
@@ -246,13 +319,22 @@
                                 <TextBlock Text="{core:Tr BackupsFolder}" Style="{StaticResource RowTitle}"/>
                                 <TextBlock Text="{Binding BackupFolder}" Style="{StaticResource Caption}" FontFamily="Cascadia Mono, Consolas"
                                            FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding BackupStats}" Style="{StaticResource Caption}" FontSize="12" Margin="0,4,0,0"/>
                             </StackPanel>
-                            <Button Grid.Column="1" Style="{StaticResource SmallButton}" Height="38" Command="{Binding OpenBackupFolderCommand}">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE838;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
-                                    <TextBlock Text="{core:Tr OpenFolder}"/>
-                                </StackPanel>
-                            </Button>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Style="{StaticResource SmallButton}" Height="38" Command="{Binding OpenBackupFolderCommand}" Margin="0,0,8,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE838;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
+                                        <TextBlock Text="{core:Tr OpenFolder}"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource SmallButton}" Height="38" Command="{Binding DeleteAllBackupsCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE74D;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0" Foreground="{StaticResource Danger}"/>
+                                        <TextBlock Text="{core:Tr Bk_DeleteAll}"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
                         </Grid>
                     </Border>
                 </StackPanel>

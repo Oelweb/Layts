@@ -73,7 +73,12 @@ public sealed class MainViewModel : ObservableObject
     }
 
     public void ShowLibrary() => Navigate(Library);
-    public void ShowSettings() => Navigate(SettingsPage);
+    public void ShowSettings()
+    {
+        SettingsPage.RefreshBackupStats();
+        foreach (var g in SettingsPage.GameBackups) g.Refresh();
+        Navigate(SettingsPage);
+    }
 
     private void Navigate(object page)
     {

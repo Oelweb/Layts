@@ -12,7 +12,8 @@
 
 **General**
 - English (default) and German – switch instantly in Settings, no restart needed
-- Settings: language, automatic update check, backup folder
+- Settings: language, automatic update check, backups
+- Backups: turn them off completely or per game, back up at most every 5 / 15 / 60 minutes, keep the last 3 / 5 / 10 / 25 per save, delete all, "Back up now" in every editor
 
 **Library**
 - Game overview with cover, hero image and logo (taken from your local Steam cache)
@@ -95,4 +96,4 @@ Result: `publish/Layts.exe` – a single file that runs without .NET installed.
 | `Themes/Dark.xaml` | Design (colors, controls, animations) |
 | `Views`, `ViewModels` | Library, settings and main window |
 
-Backups are stored in `%LOCALAPPDATA%\Layts\Backups`.
+Backups are stored in `%LOCALAPPDATA%\Layts\Backups`. By default layts backs up at most every 15 minutes and keeps the last 10 per save.

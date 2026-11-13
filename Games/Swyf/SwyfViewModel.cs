@@ -468,6 +468,7 @@ public sealed class SwyfViewModel : ObservableObject, IDisposable
         var settings = _settings;
         double fov = Fov, master = MasterVolume, music = MusicVolume, boom = ExplosionsVolume;
         bool sprint = ToggleSprint, hideUi = HideGameUi, hideKeys = HideKeysUi;
+        bool backup = ShouldBackupNow();
 
         IsBusy = true;
         ClearStatus();
@@ -475,7 +476,7 @@ public sealed class SwyfViewModel : ObservableObject, IDisposable
         {
             var summary = await Task.Run(() =>
             {
-                SwyfBackups.Create();
+                if (backup) SwyfBackups.Create();
                 var lines = new List<string>();
 
                 var run = save.Run;
@@ -539,7 +540,7 @@ public sealed class SwyfViewModel : ObservableObject, IDisposable
 
             await ReloadKeepingSlotAsync();
             var details = summary.Count > 0 ? " " + string.Join(" · ", summary) + "." : "";
-            ShowStatus(StatusKind.Success, Loc.F("Msg_Saved", details));
+            ShowStatus(StatusKind.Success, Loc.F(backup ? "Msg_Saved" : "Msg_SavedNoBackup", details));
             _ = FlashSavedAsync();
         }
         catch (Exception ex)
@@ -634,6 +635,43 @@ public sealed class SwyfViewModel : ObservableObject, IDisposable
             // ignore
         }
     }
+
+    // ---------- Backup options ----------
+
+    private const string BackupGameId = "swyf";
+
+    /// <summary>Automatic backups for this game (the global switch is in Settings).</summary>
+    public bool AutoBackupThisGame
+    {
+        get => BackupPolicy.IsGameEnabled(BackupGameId);
+        set
+        {
+            if (value == AutoBackupThisGame) return;
+            BackupPolicy.SetGameEnabled(BackupGameId, value);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(BackupHint));
+        }
+    }
+
+    public bool IsGlobalBackupOff => !AppSettings.Current.AutoBackup;
+    public string BackupHint => BackupPolicy.Hint(BackupGameId);
+
+    private ICommand? _backupNowCommand;
+    public ICommand BackupNowCommand => _backupNowCommand ??= new RelayCommand(async () =>
+    {
+        try
+        {
+            await Task.Run(() => SwyfBackups.Create());
+            LoadBackups();
+            ShowStatus(StatusKind.Success, Loc.Get("Bk_Created"));
+        }
+        catch (Exception ex)
+        {
+            ShowStatus(StatusKind.Error, Loc.F("Err_Save", ex.Message));
+        }
+    }, () => !IsBusy);
+
+    private bool ShouldBackupNow() => BackupPolicy.ShouldBackup(BackupGameId, SwyfBackups.List().FirstOrDefault()?.Created);
 
     public void Dispose() => _timer.Stop();
 }

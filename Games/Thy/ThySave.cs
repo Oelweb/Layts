@@ -211,8 +211,6 @@ public sealed class ThySave
 /// <summary>Backups of all save files under %LOCALAPPDATA%\Layts\Backups\TreesHateYou.</summary>
 public static class ThyBackups
 {
-    private const int MaxBackups = 25;
-
     public static string Root => Path.Combine(AppSettings.DataDirectory, "Backups", "TreesHateYou");
 
     public static void Create()
@@ -222,11 +220,7 @@ public static class ThyBackups
         foreach (var file in Directory.GetFiles(ThyLocator.DataDirectory, "*.json"))
             File.Copy(file, Path.Combine(dir, Path.GetFileName(file)), overwrite: true);
 
-        foreach (var old in List().Skip(MaxBackups))
-        {
-            try { Directory.Delete(old.FolderPath, recursive: true); }
-            catch { /* not critical */ }
-        }
+        BackupPolicy.Prune(Root);
     }
 
     public static List<BackupEntry> List()

@@ -266,8 +266,6 @@ public sealed class SwyfSave
 /// <summary>Backups of the whole MetaSave folder under %LOCALAPPDATA%\Layts\Backups\SWYF.</summary>
 public static class SwyfBackups
 {
-    private const int MaxBackups = 25;
-
     public static string Root => Path.Combine(AppSettings.DataDirectory, "Backups", "SWYF");
 
     public static BackupEntry Create()
@@ -280,7 +278,7 @@ public static class SwyfBackups
             System.IO.File.Copy(file, Path.Combine(dir, Path.GetFileName(file)), overwrite: true);
             size += new FileInfo(file).Length;
         }
-        Prune();
+        BackupPolicy.Prune(Root);
         return new BackupEntry { FolderPath = dir, Created = DateTime.Now, Size = size };
     }
 
@@ -307,12 +305,4 @@ public static class SwyfBackups
             System.IO.File.Copy(file, Path.Combine(SwyfLocator.MetaSaveDirectory, Path.GetFileName(file)), overwrite: true);
     }
 
-    private static void Prune()
-    {
-        foreach (var old in List().Skip(MaxBackups))
-        {
-            try { Directory.Delete(old.FolderPath, recursive: true); }
-            catch { /* not critical */ }
-        }
-    }
 }
