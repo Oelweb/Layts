@@ -61,7 +61,7 @@ public enum StatusKind { None, Info, Success, Error }
 
 public sealed class Ets2ViewModel : ObservableObject, IDisposable
 {
-    private static readonly CultureInfo German = CultureInfo.GetCultureInfo("de-DE");
+    private static CultureInfo German => Loc.Culture;
 
     private readonly MainViewModel _main;
     private readonly DispatcherTimer _timer;
@@ -83,25 +83,19 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
     {
         _main = main;
 
-        Skills.Add(new SkillViewModel("long_dist", "Langstrecke", "Aufträge über große Entfernungen"));
-        Skills.Add(new SkillViewModel("heavy", "Wertvolle Fracht", "Ladungen mit hohem Wert"));
-        Skills.Add(new SkillViewModel("fragile", "Zerbrechliche Fracht", "Empfindliche Ladung"));
-        Skills.Add(new SkillViewModel("urgent", "Just-in-Time", "Eilige Lieferungen"));
-        Skills.Add(new SkillViewModel("mechanical", "Öko-Fahren", "Geringerer Spritverbrauch"));
+        // LKW-Skills: Feldname im Spielstand → Übersetzung „Sk_<feld>“ (Name) und „Sk_<feld>_d“ (Beschreibung)
+        foreach (var key in new[] { "long_dist", "heavy", "fragile", "urgent", "mechanical" })
+            Skills.Add(new SkillViewModel(key, Loc.Get("Sk_" + key), Loc.Get("Sk_" + key + "_d")));
 
         // Coaches-DLC: laut def.scs (skills.data) haben alle Bus-Skills max_rank 3.
         // Das Bus-Öko-Fahren liegt im Spielstand im Feld „ecodriving“ (das LKW-Öko-Fahren in „mechanical“).
-        BusSkills.Add(new SkillViewModel("long_duty", "Lange Schichten", "Mehr Lohn und XP bei langen Linien", 3));
-        BusSkills.Add(new SkillViewModel("tight_schedule", "Enger Fahrplan", "Linien mit knappen Zeiten", 3));
-        BusSkills.Add(new SkillViewModel("satisfaction_decrease", "Geduldige Fahrgäste", "Zufriedenheit sinkt langsamer", 3));
-        BusSkills.Add(new SkillViewModel("low_acceleration", "Sanftes Fahren", "Fahrgäste reagieren weniger empfindlich", 3));
-        BusSkills.Add(new SkillViewModel("satisfaction_increase", "Zufriedene Fahrgäste", "Zufriedenheit steigt schneller", 3));
-        BusSkills.Add(new SkillViewModel("ecodriving", "Öko-Fahren (Bus)", "Geringerer Spritverbrauch im Bus", 3));
+        foreach (var key in new[] { "long_duty", "tight_schedule", "satisfaction_decrease", "low_acceleration", "satisfaction_increase", "ecodriving" })
+            BusSkills.Add(new SkillViewModel(key, Loc.Get("Bs_" + key), Loc.Get("Bs_" + key + "_d"), 3));
 
         string[] adr =
         {
-            "Klasse 1 · Explosiv", "Klasse 2 · Gase", "Klasse 3 · Entzündbare Flüssigkeiten",
-            "Klasse 4 · Entzündbare Feststoffe", "Klasse 6 · Giftig", "Klasse 8 · Ätzend",
+            Loc.Get("Adr1"), Loc.Get("Adr2"), Loc.Get("Adr3"),
+            Loc.Get("Adr4"), Loc.Get("Adr6"), Loc.Get("Adr8"),
         };
         for (int i = 0; i < adr.Length; i++) AdrClasses.Add(new AdrClassViewModel(i, adr[i]));
 
@@ -256,7 +250,7 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
         }
     }
 
-    public string MoneyError => TryParseNumber(MoneyText, out _) ? "" : "Bitte eine ganze Zahl eingeben, z. B. 1.000.000";
+    public string MoneyError => TryParseNumber(MoneyText, out _) ? "" : Loc.Get("Err_Money");
 
     public string XpText
     {
@@ -271,11 +265,11 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
 
     public string XpError => TryParseNumber(XpText, out var xp) && xp >= 0 && xp <= uint.MaxValue
         ? ""
-        : "Bitte eine Zahl zwischen 0 und 4.294.967.295 eingeben";
+        : Loc.Get("Err_Xp");
 
     public string LevelDisplay => TryParseNumber(XpText, out var xp) && xp >= 0
-        ? $"Level {Ets2Levels.LevelForXp(xp)}"
-        : "Level –";
+        ? Loc.F("LevelX", Ets2Levels.LevelForXp(xp))
+        : Loc.Get("LevelNone");
 
     public string LevelInput
     {
@@ -309,8 +303,8 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
     }
 
     public string BusLevelDisplay => TryParseNumber(BusXpText, out var xp) && xp >= 0
-        ? $"Bus-Level {Ets2Levels.LevelForXp(xp)}"
-        : "Bus-Level –";
+        ? Loc.F("BusLevelX", Ets2Levels.LevelForXp(xp))
+        : Loc.Get("BusLevelNone");
 
     /// <summary>Bus-Bereich nur zeigen, wenn der Spielstand das Coaches-DLC nutzt.</summary>
     public bool ShowCoaches { get => _showCoaches; private set => Set(ref _showCoaches, value); }
@@ -328,7 +322,7 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
 
     public string BusXpError => !ShowCoaches || (TryParseNumber(BusXpText, out var xp) && xp >= 0 && xp <= uint.MaxValue)
         ? ""
-        : "Bitte eine Zahl zwischen 0 und 4.294.967.295 eingeben";
+        : Loc.Get("Err_Xp");
 
     public bool DiscoverBusStops { get => _discoverBusStops; set => Set(ref _discoverBusStops, value); }
     public string BusStat { get => _busStat; private set => Set(ref _busStat, value); }
@@ -350,7 +344,7 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
 
         if (!HasProfiles)
             ShowStatus(StatusKind.Info,
-                "Es wurden keine ETS2-Profile mit Spielständen gefunden. Starte das Spiel einmal und speichere, dann auf „Aktualisieren“ klicken.");
+                Loc.Get("Err_NoProfiles"));
     }
 
     private void LoadSaves()
@@ -394,7 +388,7 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
         catch (Exception ex)
         {
             if (token != _loadToken) return;
-            ShowStatus(StatusKind.Error, "Der Spielstand konnte nicht gelesen werden: " + ex.Message);
+            ShowStatus(StatusKind.Error, Loc.F("Err_Load", ex.Message));
         }
         finally
         {
@@ -474,7 +468,7 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
     {
         if (!int.TryParse(LevelInput.Trim(), out var level) || level < 0 || level > 100_000)
         {
-            ShowStatus(StatusKind.Error, "Bitte ein gültiges Level eingeben (z. B. 50).");
+            ShowStatus(StatusKind.Error, Loc.Get("Err_Level"));
             return;
         }
         XpText = Format(Math.Min(Ets2Levels.XpForLevel(level), uint.MaxValue));
@@ -485,7 +479,7 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
     {
         if (!int.TryParse(BusLevelInput.Trim(), out var level) || level < 0 || level > 100_000)
         {
-            ShowStatus(StatusKind.Error, "Bitte ein gültiges Bus-Level eingeben (z. B. 20).");
+            ShowStatus(StatusKind.Error, Loc.Get("Err_BusLevel"));
             return;
         }
         BusXpText = Format(Math.Min(Ets2Levels.XpForLevel(level), uint.MaxValue));
@@ -506,12 +500,12 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
 
         if (!TryParseNumber(MoneyText, out var money))
         {
-            ShowStatus(StatusKind.Error, "Der Kontostand ist keine gültige Zahl.");
+            ShowStatus(StatusKind.Error, Loc.Get("Err_MoneyInvalid"));
             return;
         }
         if (!TryParseNumber(XpText, out var xp) || xp < 0 || xp > uint.MaxValue)
         {
-            ShowStatus(StatusKind.Error, "Die Erfahrungspunkte sind ungültig.");
+            ShowStatus(StatusKind.Error, Loc.Get("Err_XpInvalid"));
             return;
         }
 
@@ -519,16 +513,15 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
         bool coaches = ShowCoaches;
         if (coaches && (!TryParseNumber(BusXpText, out busXp) || busXp < 0 || busXp > uint.MaxValue))
         {
-            ShowStatus(StatusKind.Error, "Die Bus-Erfahrungspunkte sind ungültig.");
+            ShowStatus(StatusKind.Error, Loc.Get("Err_BusXpInvalid"));
             return;
         }
 
         if (Ets2Locator.IsGameRunning())
         {
             var answer = MessageBox.Show(
-                "Euro Truck Simulator 2 läuft gerade.\n\nDas Spiel überschreibt deine Änderungen beim nächsten Speichern. " +
-                "Beende das Spiel am besten zuerst.\n\nTrotzdem jetzt speichern?",
-                "Spiel läuft", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                Loc.Get("Msg_GameRunning"), Loc.Get("Msg_GameRunningTitle"),
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (answer != MessageBoxResult.Yes) return;
         }
 
@@ -557,16 +550,16 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
                 {
                     save.BusExperience = busXp;
                     foreach (var (key, value) in busSkills) save.SetSkill(key, value);
-                    if (discoverStops) lines.Add($"{save.DiscoverAllBusStops()} Bushaltestellen entdeckt");
+                    if (discoverStops) lines.Add(Loc.F("Sum_Stops", save.DiscoverAllBusStops()));
                 }
 
-                if (repair) lines.Add($"{save.RepairAllVehicles()} Fahrzeuge repariert");
-                if (refuel) lines.Add($"{save.RefuelAllTrucks()} LKW vollgetankt");
-                if (visit) lines.Add($"{save.VisitAllCities()} Städte als besucht markiert");
+                if (repair) lines.Add(Loc.F("Sum_Repaired", save.RepairAllVehicles()));
+                if (refuel) lines.Add(Loc.F("Sum_Refueled", save.RefuelAllTrucks()));
+                if (visit) lines.Add(Loc.F("Sum_Cities", save.VisitAllCities()));
                 if (upgrade || buyAll)
                 {
                     var (bought, upgraded) = save.UpgradeGarages(buyAll, upgrade);
-                    lines.Add($"{bought} Garagen gekauft, {upgraded} ausgebaut");
+                    lines.Add(Loc.F("Sum_Garages", bought, upgraded));
                 }
 
                 save.Write();
@@ -576,14 +569,13 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
             await LoadSaveAsync();
             var details = summary.Count > 0 ? " " + string.Join(" · ", summary) + "." : "";
             ShowStatus(StatusKind.Success,
-                $"Gespeichert! Ein Backup wurde vorher angelegt.{details} Lade den Spielstand jetzt im Spiel.");
+                Loc.F("Msg_Saved", details));
             _ = FlashSavedAsync();
         }
         catch (Exception ex)
         {
             await LoadSaveAsync();
-            ShowStatus(StatusKind.Error, "Speichern fehlgeschlagen: " + ex.Message +
-                " Dein Original ist im Backup gesichert.");
+            ShowStatus(StatusKind.Error, Loc.F("Err_Save", ex.Message));
         }
         finally
         {
@@ -597,20 +589,20 @@ public sealed class Ets2ViewModel : ObservableObject, IDisposable
         if (slot == null) return;
 
         var answer = MessageBox.Show(
-            $"Backup vom {backup.Display} wiederherstellen?\n\nDer aktuelle Stand wird vorher ebenfalls gesichert.",
-            "Backup wiederherstellen", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            Loc.F("Msg_Restore", backup.Display), Loc.Get("Msg_RestoreTitle"),
+            MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (answer != MessageBoxResult.Yes) return;
 
         try
         {
             await Task.Run(() => Ets2Backups.Restore(backup, slot));
             await LoadSaveAsync();
-            ShowStatus(StatusKind.Success, $"Backup vom {backup.Display} wurde wiederhergestellt.");
+            ShowStatus(StatusKind.Success, Loc.F("Msg_Restored", backup.Display));
             _ = FlashSavedAsync();
         }
         catch (Exception ex)
         {
-            ShowStatus(StatusKind.Error, "Wiederherstellen fehlgeschlagen: " + ex.Message);
+            ShowStatus(StatusKind.Error, Loc.F("Err_Restore", ex.Message));
         }
     }
 

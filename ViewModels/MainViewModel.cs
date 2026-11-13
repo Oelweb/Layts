@@ -10,45 +10,57 @@ namespace Layts.ViewModels;
 
 public sealed class MainViewModel : ObservableObject
 {
-    private readonly AppSettings _settings = AppSettings.Load();
     private object _currentView;
     private GameCardViewModel? _activeGame;
 
     public MainViewModel()
     {
+        Loc.SetLanguage(Settings.Language);
+
         foreach (var def in GameCatalog.All)
         {
             var card = new GameCardViewModel(this, def);
-            card.InitFavorite(_settings.Favorites.Contains(def.Id));
+            card.InitFavorite(Settings.Favorites.Contains(def.Id));
             Games.Add(card);
         }
         RebuildFavorites();
 
         Library = new LibraryViewModel(this);
+        SettingsPage = new SettingsViewModel(this);
         _currentView = Library;
         ShowLibraryCommand = new RelayCommand(ShowLibrary);
+        ShowSettingsCommand = new RelayCommand(ShowSettings);
 
-        // Beim Start leise nach Updates suchen (nur installierte Version).
-        _ = Task.Run(async () => await Task.Delay(2500))
-            .ContinueWith(_ => Updater.CheckAsync(silent: true), TaskScheduler.FromCurrentSynchronizationContext());
+        // Beim Start leise nach Updates suchen (nur installierte Version, abschaltbar).
+        if (Settings.AutoUpdate)
+        {
+            _ = Task.Run(async () => await Task.Delay(2500))
+                .ContinueWith(_ => Updater.CheckAsync(silent: true), TaskScheduler.FromCurrentSynchronizationContext());
+        }
     }
 
+    public AppSettings Settings { get; } = AppSettings.Load();
     public Updater Updater { get; } = new();
 
     public ObservableCollection<GameCardViewModel> Games { get; } = new();
     public ObservableCollection<GameCardViewModel> Favorites { get; } = new();
     public LibraryViewModel Library { get; }
+    public SettingsViewModel SettingsPage { get; }
     public ICommand ShowLibraryCommand { get; }
+    public ICommand ShowSettingsCommand { get; }
 
     public bool HasFavorites => Favorites.Count > 0;
     public bool IsLibraryActive => ReferenceEquals(CurrentView, Library);
+    public bool IsSettingsActive => ReferenceEquals(CurrentView, SettingsPage);
 
     public object CurrentView
     {
         get => _currentView;
         private set
         {
-            if (Set(ref _currentView, value)) OnPropertyChanged(nameof(IsLibraryActive));
+            if (!Set(ref _currentView, value)) return;
+            OnPropertyChanged(nameof(IsLibraryActive));
+            OnPropertyChanged(nameof(IsSettingsActive));
         }
     }
 
@@ -60,12 +72,15 @@ public sealed class MainViewModel : ObservableObject
         CurrentView = card.Definition.CreateViewModel(this);
     }
 
-    public void ShowLibrary()
+    public void ShowLibrary() => Navigate(Library);
+    public void ShowSettings() => Navigate(SettingsPage);
+
+    private void Navigate(object page)
     {
-        if (IsLibraryActive) return;
+        if (ReferenceEquals(CurrentView, page)) return;
         if (CurrentView is IDisposable d) d.Dispose();
         SetActive(null);
-        CurrentView = Library;
+        CurrentView = page;
     }
 
     private void SetActive(GameCardViewModel? card)
@@ -77,8 +92,8 @@ public sealed class MainViewModel : ObservableObject
 
     internal void OnFavoriteChanged()
     {
-        _settings.Favorites = Games.Where(g => g.IsFavorite).Select(g => g.Definition.Id).ToList();
-        _settings.Save();
+        Settings.Favorites = Games.Where(g => g.IsFavorite).Select(g => g.Definition.Id).ToList();
+        Settings.Save();
         RebuildFavorites();
         Library.Refresh();
     }
@@ -108,13 +123,19 @@ public sealed class GameCardViewModel : ObservableObject
 
         OpenCommand = new RelayCommand(() => _main.Open(this), () => IsAvailable);
         ToggleFavoriteCommand = new RelayCommand(() => IsFavorite = !IsFavorite);
+
+        Loc.Changed += () =>
+        {
+            OnPropertyChanged(nameof(Description));
+            OnPropertyChanged(nameof(Features));
+        };
     }
 
     public GameDefinition Definition { get; }
     public string Name => Definition.Name;
     public string Short => Definition.Short;
-    public string Description => Definition.Description;
-    public IReadOnlyList<string> Features => Definition.Features;
+    public string Description => Loc.Get(Definition.DescriptionKey);
+    public IReadOnlyList<string> Features => Definition.FeatureKeys.Select(Loc.Get).ToList();
     public bool IsAvailable => Definition.CreateViewModel != null;
 
     public ImageSource? Cover { get; }
@@ -159,12 +180,13 @@ public sealed class LibraryViewModel : ObservableObject
         GamesView = new ListCollectionView(main.Games) { Filter = Matches };
         GamesView.SortDescriptions.Add(new SortDescription(nameof(GameCardViewModel.IsFavorite), ListSortDirection.Descending));
         GamesView.SortDescriptions.Add(new SortDescription(nameof(GameCardViewModel.Name), ListSortDirection.Ascending));
+        Loc.Changed += () => OnPropertyChanged(nameof(CountText));
     }
 
     public ListCollectionView GamesView { get; }
     public ICommand ClearSearchCommand { get; }
     public bool IsEmpty => GamesView.IsEmpty;
-    public string CountText => GamesView.Count == 1 ? "1 Spiel" : $"{GamesView.Count} Spiele";
+    public string CountText => GamesView.Count == 1 ? Loc.Get("GameCountOne") : Loc.F("GameCountMany", GamesView.Count);
 
     /// <summary>Großes Banner oben: erster Favorit, sonst das erste Spiel.</summary>
     public GameCardViewModel? Featured =>

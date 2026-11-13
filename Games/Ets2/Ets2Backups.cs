@@ -10,7 +10,7 @@ public sealed class BackupEntry
     public DateTime Created { get; init; }
     public long Size { get; init; }
 
-    public string Display => Created.ToString("dd.MM.yyyy  ·  HH:mm:ss");
+    public string Display => Created.ToString("G", Layts.Core.Loc.Culture);
     public string SizeText => $"{Size / 1024.0 / 1024.0:0.0} MB";
 }
 

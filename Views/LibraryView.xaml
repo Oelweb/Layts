@@ -7,7 +7,7 @@
 
             <!-- ===== Kopf ===== -->
             <StackPanel Margin="0,0,0,24" core:Anim.FadeIn="True">
-                <TextBlock Text="Bibliothek" Style="{StaticResource H1}"/>
+                <TextBlock Text="{core:Tr Library}" Style="{StaticResource H1}"/>
                 <TextBlock Text="{Binding CountText}" Style="{StaticResource Caption}" Margin="0,4,0,0"/>
             </StackPanel>
 
@@ -61,7 +61,7 @@
 
                     <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="40,0,40,36" MaxWidth="520">
                         <Border Background="{StaticResource Accent}" CornerRadius="4" Padding="8,3" HorizontalAlignment="Left" Margin="0,0,0,18">
-                            <TextBlock Text="IM FOKUS" FontSize="10.5" FontWeight="Bold" Foreground="White"/>
+                            <TextBlock Text="{core:Tr InFocus}" FontSize="10.5" FontWeight="Bold" Foreground="White"/>
                         </Border>
 
                         <Grid HorizontalAlignment="Left">
@@ -101,7 +101,7 @@
                             <Button Style="{StaticResource PrimaryButton}" Command="{Binding OpenCommand}">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE70F;" Style="{StaticResource Icon}" Margin="0,0,10,0"/>
-                                    <TextBlock Text="Editor öffnen"/>
+                                    <TextBlock Text="{core:Tr OpenEditor}"/>
                                 </StackPanel>
                             </Button>
                             <ToggleButton Style="{StaticResource StarToggle}" IsChecked="{Binding IsFavorite}" Margin="12,0,0,0"
@@ -119,13 +119,13 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Alle Spiele" Style="{StaticResource H2}" VerticalAlignment="Center"/>
+                <TextBlock Text="{core:Tr AllGames}" Style="{StaticResource H2}" VerticalAlignment="Center"/>
 
                 <!-- Suche -->
                 <Grid Grid.Column="1" Width="260" Margin="0,0,10,0">
-                    <TextBox Style="{StaticResource SearchBox}" Tag="Spiele suchen"
+                    <TextBox Style="{StaticResource SearchBox}" Tag="{core:Tr SearchGames}"
                              Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Style="{StaticResource GhostButton}" Command="{Binding ClearSearchCommand}" ToolTip="Suche leeren"
+                    <Button Style="{StaticResource GhostButton}" Command="{Binding ClearSearchCommand}" ToolTip="{core:Tr ClearSearch}"
                             HorizontalAlignment="Right" Margin="0,0,5,0" Padding="7" Width="28" Height="28"
                             Visibility="{Binding SearchText, Converter={StaticResource TextToVis}}" core:Anim.Pop="True">
                         <Path Data="M1,1 L8,8 M8,1 L1,8" Stroke="{StaticResource Muted}" StrokeThickness="1.5"
@@ -137,13 +137,13 @@
                 <Border Grid.Column="2" Height="38" CornerRadius="19" Padding="3"
                         Background="{StaticResource Surface}" BorderBrush="{StaticResource Line}" BorderThickness="1">
                     <StackPanel Orientation="Horizontal">
-                        <RadioButton Style="{StaticResource Segment}" GroupName="LibFilter" Content="Alle"
+                        <RadioButton Style="{StaticResource Segment}" GroupName="LibFilter" Content="{core:Tr All}"
                                      IsChecked="{Binding OnlyFavorites, Converter={StaticResource InvBool}}"/>
                         <RadioButton Style="{StaticResource Segment}" GroupName="LibFilter"
                                      IsChecked="{Binding OnlyFavorites}">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#xE735;" Style="{StaticResource Icon}" FontSize="11" Foreground="{StaticResource Star}" Margin="0,0,7,0"/>
-                                <TextBlock Text="Favoriten"/>
+                                <TextBlock Text="{core:Tr Favorites}"/>
                             </StackPanel>
                         </RadioButton>
                     </StackPanel>
@@ -193,7 +193,7 @@
                                             <Border.RenderTransform>
                                                 <TranslateTransform Y="10"/>
                                             </Border.RenderTransform>
-                                            <TextBlock Text="Öffnen" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="{core:Tr Open}" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                                         </Border>
                                         <ToggleButton Style="{StaticResource StarToggle}" IsChecked="{Binding IsFavorite}"
                                                       HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10"/>
@@ -201,7 +201,7 @@
                                 </Border>
                                 <TextBlock Text="{Binding Name}" FontSize="13.5" FontWeight="SemiBold" Margin="2,11,0,0"
                                            TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Text="Spielstand-Editor" Style="{StaticResource Caption}" FontSize="12" Margin="2,2,0,0"/>
+                                <TextBlock Text="{core:Tr SaveEditor}" Style="{StaticResource Caption}" FontSize="12" Margin="2,2,0,0"/>
                             </StackPanel>
                             <DataTemplate.Triggers>
                                 <Trigger SourceName="frame" Property="IsMouseOver" Value="True">
@@ -256,15 +256,15 @@
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                             <TextBlock Text="&#xE710;" Style="{StaticResource Icon}" FontSize="22" Foreground="{StaticResource Faint}"
                                        HorizontalAlignment="Center"/>
-                            <TextBlock Text="Weitere Spiele" Foreground="{StaticResource Muted}" FontWeight="SemiBold"
+                            <TextBlock Text="{core:Tr MoreGames}" Foreground="{StaticResource Muted}" FontWeight="SemiBold"
                                        HorizontalAlignment="Center" Margin="0,12,0,0"/>
-                            <TextBlock Text="folgen bald" Style="{StaticResource Caption}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{core:Tr ComingSoon}" Style="{StaticResource Caption}" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Grid>
                 </StackPanel>
             </WrapPanel>
 
-            <TextBlock Text="Keine Spiele gefunden." Style="{StaticResource Caption}" FontSize="14"
+            <TextBlock Text="{core:Tr NoGamesFound}" Style="{StaticResource Caption}" FontSize="14"
                        Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}"/>
         </StackPanel>
     </ScrollViewer>

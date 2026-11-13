@@ -97,10 +97,10 @@ public sealed class Ets2Save
     }
 
     private ISiiUnit Bank => _doc.First("bank")
-        ?? throw new InvalidDataException("Im Spielstand wurde kein Bankkonto gefunden.");
+        ?? throw new InvalidDataException(Layts.Core.Loc.Get("Err_NoBank"));
 
     private ISiiUnit Economy => _doc.First("economy")
-        ?? throw new InvalidDataException("Im Spielstand wurden keine Spielerdaten gefunden.");
+        ?? throw new InvalidDataException(Layts.Core.Loc.Get("Err_NoEconomy"));
 
     private ISiiUnit? Player => _doc.First("player");
 

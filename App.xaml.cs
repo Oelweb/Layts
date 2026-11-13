@@ -13,7 +13,7 @@ public partial class App : Application
 
     private static void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        MessageBox.Show("Unerwarteter Fehler:\n\n" + e.Exception.Message, "Layts",
+        MessageBox.Show(Layts.Core.Loc.Get("UnexpectedError") + "\n\n" + e.Exception.Message, "layts",
             MessageBoxButton.OK, MessageBoxImage.Error);
         e.Handled = true;
     }

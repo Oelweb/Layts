@@ -32,7 +32,7 @@ public partial class MainWindow : Window
         Root.Margin = max ? new Thickness(7) : new Thickness(0);
         MaxIcon.Visibility = max ? Visibility.Collapsed : Visibility.Visible;
         RestoreIcon.Visibility = max ? Visibility.Visible : Visibility.Collapsed;
-        MaxButton.ToolTip = max ? "Wiederherstellen" : "Maximieren";
+        MaxButton.ToolTip = Loc.Get(max ? "Restore" : "Maximize");
     }
 
     private void Minimize_Click(object sender, RoutedEventArgs e) => SystemCommands.MinimizeWindow(this);

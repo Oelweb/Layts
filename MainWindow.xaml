@@ -20,6 +20,9 @@
         <DataTemplate DataType="{x:Type vm:LibraryViewModel}">
             <views:LibraryView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsView/>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type ets2:Ets2ViewModel}">
             <ets2:Ets2View/>
         </DataTemplate>
@@ -42,20 +45,27 @@
                                    Margin="11,0,0,2" VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <TextBlock DockPanel.Dock="Top" Text="MENÜ" Style="{StaticResource Overline}" Margin="14,0,0,8"/>
+                    <TextBlock DockPanel.Dock="Top" Text="{core:Tr Menu}" Style="{StaticResource Overline}" Margin="14,0,0,8"/>
                     <Button DockPanel.Dock="Top" Style="{StaticResource NavButton}" Command="{Binding ShowLibraryCommand}"
                             Tag="{Binding IsLibraryActive}"
                             WindowChrome.IsHitTestVisibleInChrome="True">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE80F;" Style="{StaticResource Icon}" FontSize="15" Margin="0,0,13,0"/>
-                            <TextBlock Text="Bibliothek"/>
+                            <TextBlock Text="{core:Tr Library}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button DockPanel.Dock="Top" Style="{StaticResource NavButton}" Command="{Binding ShowSettingsCommand}"
+                            Tag="{Binding IsSettingsActive}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE713;" Style="{StaticResource Icon}" FontSize="15" Margin="0,0,13,0"/>
+                            <TextBlock Text="{core:Tr Settings}"/>
                         </StackPanel>
                     </Button>
 
-                    <TextBlock DockPanel.Dock="Top" Text="FAVORITEN" Style="{StaticResource Overline}" Margin="14,26,0,8"/>
+                    <TextBlock DockPanel.Dock="Top" Text="{core:Tr FavoritesHeader}" Style="{StaticResource Overline}" Margin="14,26,0,8"/>
                     <TextBlock DockPanel.Dock="Top" Style="{StaticResource Caption}" Margin="14,0,8,0" Foreground="{StaticResource Faint}"
                                Visibility="{Binding HasFavorites, Converter={StaticResource InvBoolToVis}}"
-                               Text="Markiere Spiele in der Bibliothek mit dem Stern."/>
+                               Text="{core:Tr FavoritesEmpty}"/>
 
                     <!-- Unten: Updates + Hinweis -->
                     <StackPanel DockPanel.Dock="Bottom" DataContext="{Binding Updater}">
@@ -68,13 +78,9 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE896;" Style="{StaticResource Icon}" Foreground="{StaticResource Accent}" Margin="0,0,9,0"
                                                core:Anim.Pop="True"/>
-                                    <TextBlock Text="Update verfügbar" FontWeight="SemiBold" FontSize="13"/>
+                                    <TextBlock Text="{core:Tr UpdateAvailable}" FontWeight="SemiBold" FontSize="13"/>
                                 </StackPanel>
-                                <TextBlock Style="{StaticResource Caption}" FontSize="12" Margin="0,4,0,12">
-                                    <Run Text="Version"/>
-                                    <Run Text="{Binding AvailableVersion, Mode=OneWay}" Foreground="{StaticResource Text}" FontWeight="SemiBold"/>
-                                    <Run Text="ist da."/>
-                                </TextBlock>
+                                <TextBlock Text="{Binding AvailableText}" Style="{StaticResource Caption}" FontSize="12" Margin="0,4,0,12"/>
                                 <Button Style="{StaticResource PrimaryButton}" Command="{Binding UpdateCommand}" Height="34" FontSize="12.5"
                                         Padding="0" HorizontalAlignment="Stretch" WindowChrome.IsHitTestVisibleInChrome="True">
                                     <Button.Visibility>
@@ -82,7 +88,7 @@
                                     </Button.Visibility>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="&#xE896;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
-                                        <TextBlock Text="Jetzt aktualisieren"/>
+                                        <TextBlock Text="{core:Tr UpdateNow}"/>
                                     </StackPanel>
                                 </Button>
                                 <StackPanel Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}">
@@ -103,7 +109,7 @@
                                 <Run Text="{Binding CurrentVersion, Mode=OneWay, StringFormat=v{0}}"/>
                             </TextBlock>
                             <Button Grid.Column="1" Style="{StaticResource GhostButton}" Command="{Binding CheckCommand}"
-                                    Padding="8,5" FontSize="12" ToolTip="Nach Updates suchen">
+                                    Padding="8,5" FontSize="12" ToolTip="{core:Tr CheckUpdatesTip}">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE72C;" FontSize="11" Margin="0,0,6,0"
                                                RenderTransformOrigin="0.5,0.5">
@@ -130,7 +136,7 @@
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
-                                    <TextBlock Text="Updates suchen"/>
+                                    <TextBlock Text="{core:Tr CheckUpdates}"/>
                                 </StackPanel>
                             </Button>
                         </Grid>
@@ -167,12 +173,12 @@
                                 <Button Style="{StaticResource GhostButton}" Command="{Binding OpenReleasesCommand}" Padding="0,6,0,0"
                                         HorizontalAlignment="Left" FontSize="11.5" Foreground="{StaticResource Accent}"
                                         Visibility="{Binding State, Converter={StaticResource StateIs}, ConverterParameter=NotInstalled}">
-                                    <TextBlock Text="Installer herunterladen →"/>
+                                    <TextBlock Text="{core:Tr DownloadInstaller}"/>
                                 </Button>
                             </StackPanel>
                         </Border>
 
-                        <TextBlock Text="Nur für den Einzelspieler – nicht in TruckersMP oder Convoy verwenden."
+                        <TextBlock Text="{core:Tr SinglePlayerNote}"
                                    Style="{StaticResource Caption}" FontSize="11" Foreground="{StaticResource Faint}" Margin="6,0,0,0"/>
                     </StackPanel>
 
@@ -210,10 +216,10 @@
                     Background="#B3131316" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="11" Padding="3"
                     WindowChrome.IsHitTestVisibleInChrome="True">
                 <StackPanel Orientation="Horizontal">
-                    <Button Style="{StaticResource CaptionButton}" Click="Minimize_Click" ToolTip="Minimieren">
+                    <Button Style="{StaticResource CaptionButton}" Click="Minimize_Click" ToolTip="{core:Tr Minimize}">
                         <Path Style="{StaticResource CaptionIcon}" Data="M2,6 H10"/>
                     </Button>
-                    <Button x:Name="MaxButton" Style="{StaticResource CaptionButton}" Click="Maximize_Click" ToolTip="Maximieren" Margin="2,0">
+                    <Button x:Name="MaxButton" Style="{StaticResource CaptionButton}" Click="Maximize_Click" ToolTip="{core:Tr Maximize}" Margin="2,0">
                         <Grid>
                             <Path x:Name="MaxIcon" Style="{StaticResource CaptionIcon}"
                                   Data="M3.5,1.75 H8.5 A1.75,1.75 0 0 1 10.25,3.5 V8.5 A1.75,1.75 0 0 1 8.5,10.25 H3.5 A1.75,1.75 0 0 1 1.75,8.5 V3.5 A1.75,1.75 0 0 1 3.5,1.75 Z"/>
@@ -221,7 +227,7 @@
                                   Data="M1.75,4.5 H7.5 V10.25 H1.75 Z M4.5,4.5 V1.75 H10.25 V7.5 H7.5"/>
                         </Grid>
                     </Button>
-                    <Button Style="{StaticResource CloseCaptionButton}" Click="Close_Click" ToolTip="Schließen">
+                    <Button Style="{StaticResource CloseCaptionButton}" Click="Close_Click" ToolTip="{core:Tr Close}">
                         <Path Style="{StaticResource CaptionIcon}" Data="M2.5,2.5 L9.5,9.5 M9.5,2.5 L2.5,9.5"/>
                     </Button>
                 </StackPanel>

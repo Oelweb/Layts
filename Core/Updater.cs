@@ -32,22 +32,27 @@ public sealed class Updater : ObservableObject
     private UpdateInfo? _update;
     private UpdateState _state = UpdateState.Idle;
     private int _progress;
-    private string _message = "";
+    private string _error = "";
 
     public Updater()
     {
         CheckCommand = new RelayCommand(async () => await CheckAsync(silent: false), () => !IsBusy);
         UpdateCommand = new RelayCommand(async () => await DownloadAndRestartAsync(), () => State == UpdateState.Available);
-        OpenReleasesCommand = new RelayCommand(() =>
+        OpenReleasesCommand = new RelayCommand(() => OpenUrl(ReleasesUrl));
+        OpenRepoCommand = new RelayCommand(() => OpenUrl(RepoUrl));
+
+        // Texte bei Sprachwechsel neu berechnen
+        Loc.Changed += () =>
         {
-            try { Process.Start(new ProcessStartInfo(ReleasesUrl) { UseShellExecute = true }); }
-            catch { /* kein Browser */ }
-        });
+            OnPropertyChanged(nameof(Message));
+            OnPropertyChanged(nameof(AvailableText));
+        };
     }
 
     public ICommand CheckCommand { get; }
     public ICommand UpdateCommand { get; }
     public ICommand OpenReleasesCommand { get; }
+    public ICommand OpenRepoCommand { get; }
 
     /// <summary>Aktuelle Programmversion, z. B. „1.1.0“.</summary>
     public string CurrentVersion
@@ -84,6 +89,7 @@ public sealed class Updater : ObservableObject
             if (!Set(ref _state, value)) return;
             OnPropertyChanged(nameof(IsBusy));
             OnPropertyChanged(nameof(HasUpdate));
+            OnPropertyChanged(nameof(Message));
             CommandManager.InvalidateRequerySuggested();
         }
     }
@@ -92,6 +98,7 @@ public sealed class Updater : ObservableObject
     public bool HasUpdate => State is UpdateState.Available or UpdateState.Downloading or UpdateState.Restarting;
 
     public string AvailableVersion => _update?.TargetFullRelease.Version.ToString() ?? "";
+    public string AvailableText => Loc.F("UpdateVersionIs", AvailableVersion);
 
     public int Progress
     {
@@ -99,11 +106,18 @@ public sealed class Updater : ObservableObject
         private set => Set(ref _progress, value);
     }
 
-    public string Message
+    /// <summary>Statusmeldung in der aktuellen Sprache.</summary>
+    public string Message => State switch
     {
-        get => _message;
-        private set => Set(ref _message, value);
-    }
+        UpdateState.Checking => Loc.Get("Upd_Checking"),
+        UpdateState.UpToDate => Loc.Get("Upd_UpToDate"),
+        UpdateState.Available => Loc.F("Upd_Available", AvailableVersion),
+        UpdateState.Downloading => Loc.F("Upd_Downloading", AvailableVersion),
+        UpdateState.Restarting => Loc.Get("Upd_Restarting"),
+        UpdateState.NotInstalled => Loc.Get("Upd_NotInstalled"),
+        UpdateState.Error => Loc.F("Upd_Error", _error),
+        _ => "",
+    };
 
     /// <summary>Prüft auf Updates. <paramref name="silent"/> = beim Programmstart, ohne Meldungen bei „aktuell“ oder Fehlern.</summary>
     public async Task CheckAsync(bool silent)
@@ -112,55 +126,36 @@ public sealed class Updater : ObservableObject
 
         if (!IsInstalled)
         {
-            if (!silent)
-            {
-                State = UpdateState.NotInstalled;
-                Message = "Automatische Updates gibt es in der installierten Version.";
-            }
+            if (!silent) State = UpdateState.NotInstalled;
             return;
         }
 
         State = UpdateState.Checking;
-        Message = "Suche nach Updates …";
         try
         {
             _update = await _manager.CheckForUpdatesAsync();
             OnPropertyChanged(nameof(AvailableVersion));
+            OnPropertyChanged(nameof(AvailableText));
 
             if (_update != null)
             {
                 State = UpdateState.Available;
-                Message = $"Version {AvailableVersion} ist verfügbar.";
             }
             else if (silent)
             {
                 State = UpdateState.Idle;
-                Message = "";
             }
             else
             {
                 State = UpdateState.UpToDate;
-                Message = "Du hast die neueste Version.";
                 await Task.Delay(4000);
-                if (State == UpdateState.UpToDate)
-                {
-                    State = UpdateState.Idle;
-                    Message = "";
-                }
+                if (State == UpdateState.UpToDate) State = UpdateState.Idle;
             }
         }
         catch (Exception ex)
         {
-            if (silent)
-            {
-                State = UpdateState.Idle;
-                Message = "";
-            }
-            else
-            {
-                State = UpdateState.Error;
-                Message = "Update-Suche fehlgeschlagen: " + ex.Message;
-            }
+            _error = ex.Message;
+            State = silent ? UpdateState.Idle : UpdateState.Error;
         }
     }
 
@@ -170,21 +165,25 @@ public sealed class Updater : ObservableObject
 
         State = UpdateState.Downloading;
         Progress = 0;
-        Message = $"Lade Version {AvailableVersion} …";
         try
         {
             await _manager.DownloadUpdatesAsync(_update, p =>
                 System.Windows.Application.Current?.Dispatcher.BeginInvoke(() => Progress = p));
 
             State = UpdateState.Restarting;
-            Message = "Wird installiert, Layts startet gleich neu …";
             await Task.Delay(600);
             _manager.ApplyUpdatesAndRestart(_update);
         }
         catch (Exception ex)
         {
+            _error = ex.Message;
             State = UpdateState.Error;
-            Message = "Update fehlgeschlagen: " + ex.Message;
         }
+    }
+
+    private static void OpenUrl(string url)
+    {
+        try { Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); }
+        catch { /* kein Browser */ }
     }
 }

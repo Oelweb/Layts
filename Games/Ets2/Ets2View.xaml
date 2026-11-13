@@ -134,7 +134,7 @@
                     Background="#B30E0E10" BorderBrush="#33FFFFFF" Padding="12,7" WindowChrome.IsHitTestVisibleInChrome="True">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="&#xE72B;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
-                    <TextBlock Text="Bibliothek" FontSize="12.5"/>
+                    <TextBlock Text="{core:Tr Library}" FontSize="12.5"/>
                 </StackPanel>
             </Button>
 
@@ -186,11 +186,11 @@
                             <TextBlock FontSize="12">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="Text" Value="Spiel geschlossen"/>
+                                        <Setter Property="Text" Value="{core:Tr GameClosed}"/>
                                         <Setter Property="Foreground" Value="{StaticResource Success}"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsGameRunning}" Value="True">
-                                                <Setter Property="Text" Value="Spiel läuft – vor dem Speichern beenden"/>
+                                                <Setter Property="Text" Value="{core:Tr GameRunning}"/>
                                                 <Setter Property="Foreground" Value="{StaticResource Warning}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -202,7 +202,7 @@
 
                     <Border CornerRadius="12" Padding="10,5" Background="#CC2B1910"
                             Visibility="{Binding ShowCoaches, Converter={StaticResource BoolToVis}}">
-                        <TextBlock Text="Coaches-DLC erkannt" FontSize="12" Foreground="{StaticResource Accent}"/>
+                        <TextBlock Text="{core:Tr CoachesDetected}" FontSize="12" Foreground="{StaticResource Accent}"/>
                     </Border>
                 </StackPanel>
             </StackPanel>
@@ -253,10 +253,10 @@
                         <TextBlock FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Text" Value="Kein Spielstand geladen"/>
+                                    <Setter Property="Text" Value="{core:Tr NoSaveLoaded}"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsBusy}" Value="True">
-                                            <Setter Property="Text" Value="Spielstand wird geladen …"/>
+                                            <Setter Property="Text" Value="{core:Tr LoadingSave}"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -264,19 +264,19 @@
                         </TextBlock>
                     </StackPanel>
                     <TextBlock Style="{StaticResource Caption}" FontSize="13.5" Margin="0,6,0,0"
-                               Text="Wähle rechts ein Profil und einen Spielstand aus."/>
+                               Text="{core:Tr PickProfileHint}"/>
                 </StackPanel>
 
                 <TabControl Visibility="{Binding IsLoaded, Converter={StaticResource BoolToVis}}" Margin="0,14,0,0">
 
                     <!-- ===== Spieler ===== -->
-                    <TabItem Header="Spieler">
+                    <TabItem Header="{core:Tr TabPlayer}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="0,0,10,28">
                                 <Border Style="{StaticResource Card}">
                                     <StackPanel>
                                         <Border Style="{StaticResource CardHeader}">
-                                            <TextBlock Text="Finanzen" Style="{StaticResource H2}"/>
+                                            <TextBlock Text="{core:Tr Finances}" Style="{StaticResource H2}"/>
                                         </Border>
                                         <Border Style="{StaticResource Row}">
                                             <Grid>
@@ -285,8 +285,8 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
-                                                    <TextBlock Text="Kontostand" Style="{StaticResource RowTitle}"/>
-                                                    <TextBlock Text="Geld auf deinem Firmenkonto in Euro" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{core:Tr Balance}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr BalanceDesc}" Style="{StaticResource Caption}"/>
                                                     <TextBlock Text="{Binding MoneyError}" Foreground="{StaticResource Danger}" FontSize="12" Margin="0,4,0,0"
                                                                Visibility="{Binding MoneyError, Converter={StaticResource TextToVis}}"/>
                                                 </StackPanel>
@@ -296,10 +296,10 @@
                                         </Border>
                                         <Border Style="{StaticResource RowLast}">
                                             <WrapPanel>
-                                                <Button Style="{StaticResource ChipButton}" Content="+ 100.000 €" Command="{Binding AddMoneyCommand}" CommandParameter="100000"/>
-                                                <Button Style="{StaticResource ChipButton}" Content="+ 1 Mio. €" Command="{Binding AddMoneyCommand}" CommandParameter="1000000"/>
-                                                <Button Style="{StaticResource ChipButton}" Content="+ 10 Mio. €" Command="{Binding AddMoneyCommand}" CommandParameter="10000000"/>
-                                                <Button Style="{StaticResource ChipButton}" Content="+ 100 Mio. €" Command="{Binding AddMoneyCommand}" CommandParameter="100000000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="{core:Tr Add100k}" Command="{Binding AddMoneyCommand}" CommandParameter="100000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="{core:Tr Add1M}" Command="{Binding AddMoneyCommand}" CommandParameter="1000000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="{core:Tr Add10M}" Command="{Binding AddMoneyCommand}" CommandParameter="10000000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="{core:Tr Add100M}" Command="{Binding AddMoneyCommand}" CommandParameter="100000000"/>
                                             </WrapPanel>
                                         </Border>
                                     </StackPanel>
@@ -309,7 +309,7 @@
                                     <StackPanel>
                                         <Border Style="{StaticResource CardHeader}">
                                             <Grid>
-                                                <TextBlock Text="Erfahrung &amp; Level" Style="{StaticResource H2}" VerticalAlignment="Center"/>
+                                                <TextBlock Text="{core:Tr XpLevel}" Style="{StaticResource H2}" VerticalAlignment="Center"/>
                                                 <Border HorizontalAlignment="Right" Background="{StaticResource AccentSoft}" CornerRadius="12" Padding="10,3">
                                                     <TextBlock Text="{Binding LevelDisplay}" Foreground="{StaticResource Accent}" FontWeight="SemiBold" FontSize="12.5"/>
                                                 </Border>
@@ -322,8 +322,8 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
-                                                    <TextBlock Text="Erfahrungspunkte (XP)" Style="{StaticResource RowTitle}"/>
-                                                    <TextBlock Text="Daraus berechnet das Spiel dein Level" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{core:Tr XpPoints}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr XpDesc}" Style="{StaticResource Caption}"/>
                                                     <TextBlock Text="{Binding XpError}" Foreground="{StaticResource Danger}" FontSize="12" Margin="0,4,0,0"
                                                                Visibility="{Binding XpError, Converter={StaticResource TextToVis}}"/>
                                                 </StackPanel>
@@ -333,9 +333,9 @@
                                         </Border>
                                         <Border Style="{StaticResource Row}">
                                             <WrapPanel>
-                                                <Button Style="{StaticResource ChipButton}" Content="+ 10.000 XP" Command="{Binding AddXpCommand}" CommandParameter="10000"/>
-                                                <Button Style="{StaticResource ChipButton}" Content="+ 100.000 XP" Command="{Binding AddXpCommand}" CommandParameter="100000"/>
-                                                <Button Style="{StaticResource ChipButton}" Content="+ 1 Mio. XP" Command="{Binding AddXpCommand}" CommandParameter="1000000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="{core:Tr Xp10k}" Command="{Binding AddXpCommand}" CommandParameter="10000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="{core:Tr Xp100k}" Command="{Binding AddXpCommand}" CommandParameter="100000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="{core:Tr Xp1M}" Command="{Binding AddXpCommand}" CommandParameter="1000000"/>
                                             </WrapPanel>
                                         </Border>
                                         <Border Style="{StaticResource RowLast}">
@@ -345,13 +345,13 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
-                                                    <TextBlock Text="Level direkt setzen" Style="{StaticResource RowTitle}"/>
-                                                    <TextBlock Text="Trägt automatisch die passenden XP ein" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{core:Tr SetLevel}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr SetLevelDesc}" Style="{StaticResource Caption}"/>
                                                 </StackPanel>
                                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                                    <TextBox Width="134" Style="{StaticResource NumberBox}" Tag="Level"
+                                                    <TextBox Width="134" Style="{StaticResource NumberBox}" Tag="{core:Tr LevelUnit}"
                                                              Text="{Binding LevelInput, UpdateSourceTrigger=PropertyChanged}"/>
-                                                    <Button Style="{StaticResource SoftButton}" Content="Setzen" Command="{Binding SetLevelCommand}"
+                                                    <Button Style="{StaticResource SoftButton}" Content="{core:Tr Set}" Command="{Binding SetLevelCommand}"
                                                             Width="78" Margin="8,0,0,0"/>
                                                 </StackPanel>
                                             </Grid>
@@ -363,15 +363,15 @@
                     </TabItem>
 
                     <!-- ===== Fähigkeiten ===== -->
-                    <TabItem Header="Fähigkeiten">
+                    <TabItem Header="{core:Tr TabSkills}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="0,0,10,28">
                                 <Border Style="{StaticResource Card}">
                                     <StackPanel>
                                         <Border Style="{StaticResource CardHeader}">
                                             <StackPanel>
-                                                <TextBlock Text="ADR-Gefahrgut" Style="{StaticResource H2}"/>
-                                                <TextBlock Text="Welche Gefahrgutklassen du transportieren darfst" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                                <TextBlock Text="{core:Tr AdrTitle}" Style="{StaticResource H2}"/>
+                                                <TextBlock Text="{core:Tr AdrDesc}" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
                                             </StackPanel>
                                         </Border>
                                         <ItemsControl ItemsSource="{Binding AdrClasses}" Margin="20,16,12,8">
@@ -394,10 +394,10 @@
                                         <Border Style="{StaticResource CardHeader}">
                                             <Grid>
                                                 <StackPanel>
-                                                    <TextBlock Text="LKW-Fähigkeiten" Style="{StaticResource H2}"/>
-                                                    <TextBlock Text="Stufe 0 bis 6" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="{core:Tr TruckSkills}" Style="{StaticResource H2}"/>
+                                                    <TextBlock Text="{core:Tr Levels0to6}" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
                                                 </StackPanel>
-                                                <Button Style="{StaticResource SmallButton}" Content="Alles auf Maximum" Command="{Binding MaxSkillsCommand}"
+                                                <Button Style="{StaticResource SmallButton}" Content="{core:Tr MaxAll}" Command="{Binding MaxSkillsCommand}"
                                                         HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
                                         </Border>
@@ -409,15 +409,15 @@
                     </TabItem>
 
                     <!-- ===== Firma & Fahrzeuge ===== -->
-                    <TabItem Header="Firma &amp; Fahrzeuge">
+                    <TabItem Header="{core:Tr TabCompany}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="0,0,10,28">
                                 <Border Style="{StaticResource Card}">
                                     <StackPanel>
                                         <Border Style="{StaticResource CardHeader}">
                                             <StackPanel>
-                                                <TextBlock Text="Aktionen" Style="{StaticResource H2}"/>
-                                                <TextBlock Text="Werden beim Speichern ausgeführt" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                                <TextBlock Text="{core:Tr Actions}" Style="{StaticResource H2}"/>
+                                                <TextBlock Text="{core:Tr ActionsDesc}" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
                                             </StackPanel>
                                         </Border>
 
@@ -428,8 +428,8 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Margin="0,0,24,0">
-                                                    <TextBlock Text="Alle LKW, Busse &amp; Anhänger reparieren" Style="{StaticResource RowTitle}"/>
-                                                    <TextBlock Text="Setzt jeden Verschleiß und Schaden auf 0 %" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{core:Tr Repair}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr RepairDesc}" Style="{StaticResource Caption}"/>
                                                 </StackPanel>
                                                 <CheckBox Grid.Column="1" IsChecked="{Binding RepairVehicles}"/>
                                             </Grid>
@@ -441,8 +441,8 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Margin="0,0,24,0">
-                                                    <TextBlock Text="Alle LKW &amp; Busse volltanken" Style="{StaticResource RowTitle}"/>
-                                                    <TextBlock Text="Tank auf 100 %" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{core:Tr Refuel}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr RefuelDesc}" Style="{StaticResource Caption}"/>
                                                 </StackPanel>
                                                 <CheckBox Grid.Column="1" IsChecked="{Binding RefuelTrucks}"/>
                                             </Grid>
@@ -454,8 +454,8 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Margin="0,0,24,0">
-                                                    <TextBlock Text="Alle Städte als besucht markieren" Style="{StaticResource RowTitle}"/>
-                                                    <TextBlock Text="Damit kannst du überall Garagen kaufen" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{core:Tr VisitCities}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr VisitCitiesDesc}" Style="{StaticResource Caption}"/>
                                                 </StackPanel>
                                                 <CheckBox Grid.Column="1" IsChecked="{Binding VisitCities}"/>
                                             </Grid>
@@ -467,8 +467,8 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Margin="0,0,24,0">
-                                                    <TextBlock Text="Eigene Garagen auf „Groß“ ausbauen" Style="{StaticResource RowTitle}"/>
-                                                    <TextBlock Text="5 Stellplätze, vorhandene LKW und Fahrer bleiben erhalten" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{core:Tr UpgradeGarages}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr UpgradeGaragesDesc}" Style="{StaticResource Caption}"/>
                                                 </StackPanel>
                                                 <CheckBox Grid.Column="1" IsChecked="{Binding UpgradeGarages}"/>
                                             </Grid>
@@ -480,8 +480,8 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Margin="0,0,24,0">
-                                                    <TextBlock Text="Alle Garagen kaufen" Style="{StaticResource RowTitle}"/>
-                                                    <TextBlock Text="Kostenlos in jeder Stadt, jeweils groß mit 5 Stellplätzen" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{core:Tr BuyGarages}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr BuyGaragesDesc}" Style="{StaticResource Caption}"/>
                                                 </StackPanel>
                                                 <CheckBox Grid.Column="1" IsChecked="{Binding BuyAllGarages}"/>
                                             </Grid>
@@ -493,7 +493,7 @@
                     </TabItem>
 
                     <!-- ===== Coaches (nur mit DLC) ===== -->
-                    <TabItem Header="Coaches" Visibility="{Binding ShowCoaches, Converter={StaticResource BoolToVis}}">
+                    <TabItem Header="{core:Tr TabCoaches}" Visibility="{Binding ShowCoaches, Converter={StaticResource BoolToVis}}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="0,0,10,28">
                                 <Border Style="{StaticResource Card}">
@@ -501,8 +501,8 @@
                                         <Border Style="{StaticResource CardHeader}">
                                             <Grid>
                                                 <StackPanel>
-                                                    <TextBlock Text="Bus-Erfahrung" Style="{StaticResource H2}"/>
-                                                    <TextBlock Text="Eigener Level-Zähler für Busse – getrennt vom LKW-Level" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="{core:Tr BusXp}" Style="{StaticResource H2}"/>
+                                                    <TextBlock Text="{core:Tr BusXpDesc}" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
                                                 </StackPanel>
                                                 <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="{StaticResource AccentSoft}"
                                                         CornerRadius="12" Padding="10,3">
@@ -517,8 +517,8 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
-                                                    <TextBlock Text="Bus-Erfahrungspunkte (XP)" Style="{StaticResource RowTitle}"/>
-                                                    <TextBlock Text="Pro Bus-Level gibt es einen Bus-Skillpunkt" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{core:Tr BusXpPoints}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr BusXpPointsDesc}" Style="{StaticResource Caption}"/>
                                                     <TextBlock Text="{Binding BusXpError}" Foreground="{StaticResource Danger}" FontSize="12" Margin="0,4,0,0"
                                                                Visibility="{Binding BusXpError, Converter={StaticResource TextToVis}}"/>
                                                 </StackPanel>
@@ -528,9 +528,9 @@
                                         </Border>
                                         <Border Style="{StaticResource Row}">
                                             <WrapPanel>
-                                                <Button Style="{StaticResource ChipButton}" Content="+ 1.000 XP" Command="{Binding AddBusXpCommand}" CommandParameter="1000"/>
-                                                <Button Style="{StaticResource ChipButton}" Content="+ 10.000 XP" Command="{Binding AddBusXpCommand}" CommandParameter="10000"/>
-                                                <Button Style="{StaticResource ChipButton}" Content="+ 100.000 XP" Command="{Binding AddBusXpCommand}" CommandParameter="100000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="{core:Tr Xp1k}" Command="{Binding AddBusXpCommand}" CommandParameter="1000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="{core:Tr Xp10k}" Command="{Binding AddBusXpCommand}" CommandParameter="10000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="{core:Tr Xp100k}" Command="{Binding AddBusXpCommand}" CommandParameter="100000"/>
                                             </WrapPanel>
                                         </Border>
                                         <Border Style="{StaticResource RowLast}">
@@ -540,13 +540,13 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
-                                                    <TextBlock Text="Bus-Level direkt setzen" Style="{StaticResource RowTitle}"/>
-                                                    <TextBlock Text="Trägt automatisch die passenden Bus-XP ein" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{core:Tr SetBusLevel}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr SetBusLevelDesc}" Style="{StaticResource Caption}"/>
                                                 </StackPanel>
                                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                                    <TextBox Width="134" Style="{StaticResource NumberBox}" Tag="Level"
+                                                    <TextBox Width="134" Style="{StaticResource NumberBox}" Tag="{core:Tr LevelUnit}"
                                                              Text="{Binding BusLevelInput, UpdateSourceTrigger=PropertyChanged}"/>
-                                                    <Button Style="{StaticResource SoftButton}" Content="Setzen" Command="{Binding SetBusLevelCommand}"
+                                                    <Button Style="{StaticResource SoftButton}" Content="{core:Tr Set}" Command="{Binding SetBusLevelCommand}"
                                                             Width="78" Margin="8,0,0,0"/>
                                                 </StackPanel>
                                             </Grid>
@@ -559,10 +559,10 @@
                                         <Border Style="{StaticResource CardHeader}">
                                             <Grid>
                                                 <StackPanel>
-                                                    <TextBlock Text="Bus-Fähigkeiten" Style="{StaticResource H2}"/>
-                                                    <TextBlock Text="Stufe 0 bis 3 – wie im Spiel" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="{core:Tr BusSkills}" Style="{StaticResource H2}"/>
+                                                    <TextBlock Text="{core:Tr Levels0to3}" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
                                                 </StackPanel>
-                                                <Button Style="{StaticResource SmallButton}" Content="Alles auf Maximum" Command="{Binding MaxBusSkillsCommand}"
+                                                <Button Style="{StaticResource SmallButton}" Content="{core:Tr MaxAll}" Command="{Binding MaxBusSkillsCommand}"
                                                         HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
                                         </Border>
@@ -578,8 +578,8 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Margin="0,0,24,0">
-                                                <TextBlock Text="Alle Bushaltestellen entdecken" Style="{StaticResource RowTitle}"/>
-                                                <TextBlock Text="Busbahnhöfe und Haltestellen auf der Karte freischalten" Style="{StaticResource Caption}"/>
+                                                <TextBlock Text="{core:Tr DiscoverStops}" Style="{StaticResource RowTitle}"/>
+                                                <TextBlock Text="{core:Tr DiscoverStopsDesc}" Style="{StaticResource Caption}"/>
                                             </StackPanel>
                                             <CheckBox Grid.Column="1" IsChecked="{Binding DiscoverBusStops}"/>
                                         </Grid>
@@ -590,7 +590,7 @@
                     </TabItem>
 
                     <!-- ===== Backups ===== -->
-                    <TabItem Header="Backups">
+                    <TabItem Header="{core:Tr TabBackups}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="0,0,10,28">
                                 <Border Style="{StaticResource Card}">
@@ -598,15 +598,15 @@
                                         <Border Style="{StaticResource CardHeader}">
                                             <Grid>
                                                 <StackPanel>
-                                                    <TextBlock Text="Backups" Style="{StaticResource H2}"/>
-                                                    <TextBlock Text="Vor jedem Speichern automatisch – bis zu 25 pro Spielstand" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                                    <TextBlock Text="{core:Tr TabBackups}" Style="{StaticResource H2}"/>
+                                                    <TextBlock Text="{core:Tr BackupsDesc}" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
                                                 </StackPanel>
-                                                <Button Style="{StaticResource SmallButton}" Content="Ordner öffnen" Command="{Binding OpenBackupFolderCommand}"
+                                                <Button Style="{StaticResource SmallButton}" Content="{core:Tr OpenFolder}" Command="{Binding OpenBackupFolderCommand}"
                                                         HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                             </Grid>
                                         </Border>
 
-                                        <TextBlock Text="Noch keine Backups für diesen Spielstand." Margin="20,18">
+                                        <TextBlock Text="{core:Tr NoBackups}" Margin="20,18">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
                                                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -634,7 +634,7 @@
                                                             <TextBlock Grid.Column="1" Text="{Binding Display}" VerticalAlignment="Center" FontSize="13.5"/>
                                                             <TextBlock Grid.Column="2" Text="{Binding SizeText}" Style="{StaticResource Caption}"
                                                                        VerticalAlignment="Center" Margin="12,0,16,0"/>
-                                                            <Button Grid.Column="3" Content="Wiederherstellen" Padding="12,6" FontSize="12.5"
+                                                            <Button Grid.Column="3" Content="{core:Tr Restore}" Padding="12,6" FontSize="12.5"
                                                                     Command="{Binding DataContext.RestoreBackupCommand, ElementName=Root}"
                                                                     CommandParameter="{Binding}"/>
                                                         </Grid>
@@ -656,10 +656,10 @@
                     <!-- Auswahl -->
                     <Border Style="{StaticResource Card}" Padding="20">
                         <StackPanel>
-                            <TextBlock Text="PROFIL" Style="{StaticResource Overline}"/>
+                            <TextBlock Text="{core:Tr ProfileHeader}" Style="{StaticResource Overline}"/>
                             <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}"
                                       ItemTemplate="{StaticResource ProfileItem}" MinHeight="54"/>
-                            <TextBlock Text="SPIELSTAND" Style="{StaticResource Overline}" Margin="0,16,0,8"/>
+                            <TextBlock Text="{core:Tr SaveHeader}" Style="{StaticResource Overline}" Margin="0,16,0,8"/>
                             <ComboBox ItemsSource="{Binding Saves}" SelectedItem="{Binding SelectedSave}"
                                       ItemTemplate="{StaticResource SaveItem}" MinHeight="54"/>
                             <Grid Margin="0,12,0,0">
@@ -671,13 +671,13 @@
                                 <Button Style="{StaticResource SmallButton}" Command="{Binding RefreshCommand}" Height="34">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="&#xE72C;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
-                                        <TextBlock Text="Aktualisieren"/>
+                                        <TextBlock Text="{core:Tr Refresh}"/>
                                     </StackPanel>
                                 </Button>
                                 <Button Grid.Column="2" Style="{StaticResource SmallButton}" Command="{Binding OpenSaveFolderCommand}" Height="34">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="&#xE838;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
-                                        <TextBlock Text="Ordner"/>
+                                        <TextBlock Text="{core:Tr Folder}"/>
                                     </StackPanel>
                                 </Button>
                             </Grid>
@@ -703,16 +703,16 @@
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
                                                 Visibility="{Binding JustSaved, Converter={StaticResource InvBoolToVis}}">
                                         <TextBlock Text="&#xE74E;" Style="{StaticResource Icon}" Margin="0,0,10,0"/>
-                                        <TextBlock Text="Änderungen speichern"/>
+                                        <TextBlock Text="{core:Tr SaveChanges}"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" core:Anim.Pop="True"
                                                 Visibility="{Binding JustSaved, Converter={StaticResource BoolToVis}}">
                                         <TextBlock Text="&#xE73E;" Style="{StaticResource Icon}" FontWeight="Bold" Margin="0,0,10,0"/>
-                                        <TextBlock Text="Gespeichert"/>
+                                        <TextBlock Text="{core:Tr Saved}"/>
                                     </StackPanel>
                                 </Grid>
                             </Button>
-                            <TextBlock Text="Vorher wird automatisch ein Backup erstellt." Style="{StaticResource Caption}" FontSize="12"
+                            <TextBlock Text="{core:Tr BackupFirst}" Style="{StaticResource Caption}" FontSize="12"
                                        HorizontalAlignment="Center" Margin="0,10,0,0"/>
 
                             <!-- Statusmeldung -->
@@ -744,7 +744,7 @@
                     <Border Style="{StaticResource Card}" Padding="20,18,20,8"
                             Visibility="{Binding IsLoaded, Converter={StaticResource BoolToVis}}">
                         <StackPanel>
-                            <TextBlock Text="ÜBERSICHT" Style="{StaticResource Overline}" Margin="0,0,0,14"/>
+                            <TextBlock Text="{core:Tr Overview}" Style="{StaticResource Overline}" Margin="0,0,0,14"/>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -753,15 +753,15 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="LKW" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Text="{core:Tr Trucks}" Style="{StaticResource StatLabel}"/>
                                 <TextBlock Grid.Column="1" Text="{Binding TruckStat}" Style="{StaticResource StatValue}"/>
-                                <TextBlock Grid.Row="1" Text="Anhänger" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="1" Text="{core:Tr Trailers}" Style="{StaticResource StatLabel}"/>
                                 <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TrailerStat}" Style="{StaticResource StatValue}"/>
-                                <TextBlock Grid.Row="2" Text="Fahrer" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="2" Text="{core:Tr Drivers}" Style="{StaticResource StatLabel}"/>
                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding DriverStat}" Style="{StaticResource StatValue}"/>
-                                <TextBlock Grid.Row="3" Text="Garagen" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="3" Text="{core:Tr Garages}" Style="{StaticResource StatLabel}"/>
                                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding GarageStat}" Style="{StaticResource StatValue}"/>
-                                <TextBlock Grid.Row="4" Text="Besuchte Städte" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="4" Text="{core:Tr VisitedCities}" Style="{StaticResource StatLabel}"/>
                                 <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding CityStat}" Style="{StaticResource StatValue}"/>
                             </Grid>
 
@@ -773,17 +773,17 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition/><RowDefinition/><RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="Busse" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Text="{core:Tr Buses}" Style="{StaticResource StatLabel}"/>
                                 <TextBlock Grid.Column="1" Text="{Binding BusStat}" Style="{StaticResource StatValue}"/>
-                                <TextBlock Grid.Row="1" Text="Linienfahrten" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="1" Text="{core:Tr BusTrips}" Style="{StaticResource StatLabel}"/>
                                 <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding BusTripStat}" Style="{StaticResource StatValue}"/>
-                                <TextBlock Grid.Row="2" Text="Haltestellen entdeckt" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="2" Text="{core:Tr StopsFound}" Style="{StaticResource StatLabel}"/>
                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding BusStopStat}" Style="{StaticResource StatValue}"/>
                             </Grid>
 
                             <Border BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="0,12,0,0" Margin="0,4,0,0">
                                 <TextBlock Style="{StaticResource Caption}" FontSize="11.5" Margin="0,0,0,10">
-                                    <Run Text="Format:"/>
+                                    <Run Text="{core:Tr Format}"/>
                                     <Run Text="{Binding FormatLabel, Mode=OneWay}"/>
                                 </TextBlock>
                             </Border>
@@ -793,12 +793,10 @@
                     <!-- Hinweise -->
                     <Border Style="{StaticResource Card}" Padding="20" Background="Transparent">
                         <StackPanel>
-                            <TextBlock Text="SO GEHT'S" Style="{StaticResource Overline}" Margin="0,0,0,10"/>
-                            <TextBlock Style="{StaticResource Caption}" FontSize="12.5" LineHeight="20">
-                                1. Spiel beenden oder ins Hauptmenü gehen<LineBreak/>
-                                2. Werte ändern und speichern<LineBreak/>
-                                3. Im Spiel über „Laden“ den Spielstand öffnen
-                            </TextBlock>
+                            <TextBlock Text="{core:Tr HowTo}" Style="{StaticResource Overline}" Margin="0,0,0,10"/>
+                            <TextBlock Text="{core:Tr HowTo1}" Style="{StaticResource Caption}" FontSize="12.5" Margin="0,0,0,4"/>
+                            <TextBlock Text="{core:Tr HowTo2}" Style="{StaticResource Caption}" FontSize="12.5" Margin="0,0,0,4"/>
+                            <TextBlock Text="{core:Tr HowTo3}" Style="{StaticResource Caption}" FontSize="12.5"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>

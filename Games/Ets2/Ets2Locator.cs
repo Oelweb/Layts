@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using Layts.Core;
 using Layts.Core.Sii;
 
 namespace Layts.Games.Ets2;
@@ -11,7 +12,15 @@ public sealed class Ets2Profile
     public required string Source { get; init; }
     public DateTime LastPlayed { get; init; }
 
-    public bool IsSteamCloud => Source == "Steam Cloud";
+    /// <summary>Herkunft: „local“, „steam“ oder „cloud“.</summary>
+    public bool IsSteamCloud => Source == "cloud";
+
+    public string SourceLabel => Source switch
+    {
+        "cloud" => Loc.Get("Src_SteamCloud"),
+        "steam" => Loc.Get("Src_Steam"),
+        _ => Loc.Get("Src_Local"),
+    };
     public string SaveRoot => Path.Combine(FolderPath, "save");
 
     /// <summary>Anfangsbuchstabe für den Avatar im Auswahlmenü.</summary>
@@ -20,8 +29,8 @@ public sealed class Ets2Profile
     /// <summary>Wolke für Steam Cloud, sonst PC-Symbol.</summary>
     public string SourceGlyph => IsSteamCloud ? "" : "";
 
-    public string SourceText => $"{Source} · zuletzt {LastPlayed:dd.MM.yyyy}";
-    public string Display => $"{Name}   ·   {Source}";
+    public string SourceText => Loc.F("LastPlayed", SourceLabel, LastPlayed);
+    public string Display => $"{Name}   ·   {SourceLabel}";
     public override string ToString() => Display;
 }
 
@@ -39,11 +48,11 @@ public sealed class Ets2SaveSlot
     public string Glyph => IsAutosave ? "" : "";
 
     public string DateText => LastWrite.Date == DateTime.Today
-        ? $"Heute, {LastWrite:HH:mm} Uhr"
+        ? Loc.F("Date_Today", LastWrite)
         : LastWrite.Date == DateTime.Today.AddDays(-1)
-            ? $"Gestern, {LastWrite:HH:mm} Uhr"
-            : $"{LastWrite:dd.MM.yyyy, HH:mm} Uhr";
-    public string Display => $"{Name}   ·   {LastWrite:dd.MM.yyyy HH:mm}";
+            ? Loc.F("Date_Yesterday", LastWrite)
+            : Loc.F("Date_Other", LastWrite);
+    public string Display => $"{Name}   ·   {DateText}";
     public override string ToString() => Display;
 }
 
@@ -66,11 +75,11 @@ public static class Ets2Locator
     {
         var roots = new List<(string Path, string Source)>
         {
-            (Path.Combine(DocumentsDirectory, "profiles"), "Lokal"),
-            (Path.Combine(DocumentsDirectory, "steam_profiles"), "Steam"),
+            (Path.Combine(DocumentsDirectory, "profiles"), "local"),
+            (Path.Combine(DocumentsDirectory, "steam_profiles"), "steam"),
         };
         foreach (var userDir in SteamUserDirectories())
-            roots.Add((Path.Combine(userDir, "227300", "remote", "profiles"), "Steam Cloud"));
+            roots.Add((Path.Combine(userDir, "227300", "remote", "profiles"), "cloud"));
 
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var result = new List<Ets2Profile>();
@@ -121,13 +130,13 @@ public static class Ets2Locator
 
     private static string FriendlySlotName(string folder)
     {
-        if (folder == "autosave") return "Autosave";
-        if (folder == "quicksave") return "Schnellspeicherung";
-        if (folder == "multiplayer_backup") return "Multiplayer-Backup";
+        if (folder == "autosave") return Loc.Get("Slot_Autosave");
+        if (folder == "quicksave") return Loc.Get("Slot_Quicksave");
+        if (folder == "multiplayer_backup") return Loc.Get("Slot_MpBackup");
         if (folder.StartsWith("autosave_drive", StringComparison.Ordinal))
-            return "Fahrt-Autosave" + folder["autosave_drive".Length..].Replace('_', ' ');
-        if (folder.StartsWith("autosave_job", StringComparison.Ordinal)) return "Auftrags-Autosave";
-        if (int.TryParse(folder, out var n)) return $"Spielstand {n}";
+            return Loc.F("Slot_Drive", folder["autosave_drive".Length..].Replace('_', ' '));
+        if (folder.StartsWith("autosave_job", StringComparison.Ordinal)) return Loc.Get("Slot_Job");
+        if (int.TryParse(folder, out var n)) return Loc.F("Slot_N", n);
         return folder;
     }
 

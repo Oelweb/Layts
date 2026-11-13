@@ -10,6 +10,10 @@
 
 ## Funktionen
 
+**Allgemein**
+- Englisch (Standard) und Deutsch – umschaltbar in den Einstellungen, sofort ohne Neustart
+- Einstellungen: Sprache, automatische Update-Suche, Backup-Ordner
+
 **Bibliothek**
 - Spiele-Übersicht mit Cover, Titelbild und Logo (aus dem lokalen Steam-Cache)
 - Favoriten, Suche und Filter
@@ -63,7 +67,8 @@ Ergebnis: `publish/Layts.exe` – eine einzelne Datei, die ohne installiertes .N
 | Ordner | Inhalt |
 |---|---|
 | `Core/Sii` | Entschlüsseln, Lesen und Schreiben von SII-Dateien (binär + Text) |
-| `Core` | Animationen, Steam-Bilder, Hilfsklassen |
+| `Core` | Animationen, Steam-Bilder, Updater, Hilfsklassen |
+| `Core/Strings.cs` | Alle Texte auf Englisch und Deutsch – neue Sprache = neue Spalte |
 | `Games/GameCatalog.cs` | Liste der Spiele – ein neues Spiel = neuer Eintrag + Ordner unter `Games/` |
 | `Games/Ets2` | ETS2-Editor (Logik, Backups, Oberfläche) |
 | `Themes/Dark.xaml` | Design (Farben, Controls, Animationen) |

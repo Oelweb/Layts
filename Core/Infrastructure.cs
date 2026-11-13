@@ -56,6 +56,12 @@ public sealed class AppSettings
 {
     public List<string> Favorites { get; set; } = new();
 
+    /// <summary>„en“ (Standard) oder „de“.</summary>
+    public string Language { get; set; } = "en";
+
+    /// <summary>Beim Start automatisch nach Updates suchen.</summary>
+    public bool AutoUpdate { get; set; } = true;
+
     public static string DataDirectory =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Layts");
 

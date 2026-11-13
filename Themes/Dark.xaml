@@ -814,7 +814,7 @@
     <Style x:Key="StarToggle" TargetType="ToggleButton">
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-        <Setter Property="ToolTip" Value="Favorit"/>
+        <Setter Property="ToolTip" Value="{core:Tr Favorite}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
