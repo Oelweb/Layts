@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 720" width="1200" height="720">
+  <defs>
+    <!-- A: Block-L, die fehlende Ecke ist der „Spielstand-Slot“ -->
+    <symbol id="a" viewBox="0 0 512 512">
+      <rect width="512" height="512" rx="96" fill="#17171A"/>
+      <path d="M136 136 H248 V264 H376 V376 H136 Z" fill="#F4F4F2"/>
+      <rect x="296" y="136" width="80" height="80" rx="6" fill="#FF5A1F"/>
+    </symbol>
+
+    <!-- B: Auswahlrahmen (Editor) mit Akzent-Quadrat -->
+    <symbol id="b" viewBox="0 0 512 512">
+      <rect width="512" height="512" rx="96" fill="#17171A"/>
+      <path d="M128 232 V128 H232" fill="none" stroke="#F4F4F2" stroke-width="40"/>
+      <path d="M384 280 V384 H280" fill="none" stroke="#F4F4F2" stroke-width="40"/>
+      <rect x="216" y="216" width="80" height="80" rx="6" fill="#FF5A1F"/>
+    </symbol>
+
+    <!-- C: kleines „l“ mit Punkt -->
+    <symbol id="c" viewBox="0 0 512 512">
+      <rect width="512" height="512" rx="96" fill="#17171A"/>
+      <rect x="170" y="112" width="84" height="288" rx="4" fill="#F4F4F2"/>
+      <rect x="290" y="316" width="84" height="84" rx="4" fill="#FF5A1F"/>
+    </symbol>
+
+    <style>
+      .word { font-family: "Segoe UI Variable Display", "Segoe UI", Inter, Arial, sans-serif; font-weight: 600; fill: #F4F4F2; }
+      .lbl  { font-family: "Segoe UI Variable Text", "Segoe UI", Inter, Arial, sans-serif; font-size: 13px; letter-spacing: 3px; fill: #6B6B73; font-weight: 600; }
+      .sub  { font-family: "Segoe UI Variable Text", "Segoe UI", Inter, Arial, sans-serif; font-size: 14px; fill: #8C8C94; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="720" fill="#0E0E10"/>
+
+  <!-- Spalte A -->
+  <text class="lbl" x="100" y="96">VARIANTE A</text>
+  <use href="#a" xlink:href="#a" x="100" y="124" width="240" height="240"/>
+  <use href="#a" xlink:href="#a" x="100" y="420" width="48" height="48"/>
+  <text class="word" x="164" y="456" font-size="34" letter-spacing="-1">layts</text>
+  <use href="#a" xlink:href="#a" x="100" y="520" width="32" height="32"/>
+  <use href="#a" xlink:href="#a" x="148" y="528" width="16" height="16"/>
+  <text class="sub" x="100" y="610">Block-„L“ – die freie Ecke ist ein Speicher-Slot</text>
+
+  <!-- Spalte B -->
+  <text class="lbl" x="480" y="96">VARIANTE B</text>
+  <use href="#b" xlink:href="#b" x="480" y="124" width="240" height="240"/>
+  <use href="#b" xlink:href="#b" x="480" y="420" width="48" height="48"/>
+  <text class="word" x="544" y="456" font-size="34" letter-spacing="-1">layts</text>
+  <use href="#b" xlink:href="#b" x="480" y="520" width="32" height="32"/>
+  <use href="#b" xlink:href="#b" x="528" y="528" width="16" height="16"/>
+  <text class="sub" x="480" y="610">Auswahlrahmen – „etwas bearbeiten“</text>
+
+  <!-- Spalte C -->
+  <text class="lbl" x="860" y="96">VARIANTE C</text>
+  <use href="#c" xlink:href="#c" x="860" y="124" width="240" height="240"/>
+  <use href="#c" xlink:href="#c" x="860" y="420" width="48" height="48"/>
+  <text class="word" x="924" y="456" font-size="34" letter-spacing="-1">layts<tspan fill="#FF5A1F">.</tspan></text>
+  <use href="#c" xlink:href="#c" x="860" y="520" width="32" height="32"/>
+  <use href="#c" xlink:href="#c" x="908" y="528" width="16" height="16"/>
+  <text class="sub" x="860" y="610">„l.“ – nur Buchstabe und Punkt</text>
+</svg>

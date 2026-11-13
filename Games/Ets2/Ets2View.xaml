@@ -1,0 +1,808 @@
+<UserControl x:Class="Layts.Games.Ets2.Ets2View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:core="clr-namespace:Layts.Core"
+             x:Name="Root">
+
+    <UserControl.Resources>
+        <!-- Zeile mit Slider für Skills -->
+        <DataTemplate x:Key="SkillRow">
+            <Border Style="{StaticResource Row}" IsEnabled="{Binding IsAvailable}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                        <TextBlock Text="{Binding Label}" Style="{StaticResource RowTitle}"/>
+                        <TextBlock Text="{Binding Description}" Style="{StaticResource Caption}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Slider Width="230" Minimum="0" Maximum="{Binding Max}" Value="{Binding Value}" VerticalAlignment="Center"/>
+                        <TextBlock Width="48" TextAlignment="Right" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="14">
+                            <Run Text="{Binding Value, Mode=OneWay}"/><Run Text="{Binding MaxText, Mode=OneWay}" Foreground="{StaticResource Faint}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <!-- Eintrag im Profil-Menü: Avatar mit Anfangsbuchstabe, Name, Quelle -->
+        <DataTemplate x:Key="ProfileItem">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Width="30" Height="30" CornerRadius="15" Background="{StaticResource AccentSoft}" Margin="0,0,11,0">
+                    <TextBlock Text="{Binding Initial}" FontWeight="Bold" FontSize="13" Foreground="{StaticResource Accent}"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,1,0,0">
+                        <TextBlock Text="{Binding SourceGlyph}" Style="{StaticResource Icon}" FontSize="10.5"
+                                   Foreground="{StaticResource Faint}" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding SourceText}" FontSize="11.5" Foreground="{StaticResource Muted}" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Eintrag im Spielstand-Menü: Symbol (Uhr = Autosave), Name, Datum -->
+        <DataTemplate x:Key="SaveItem">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Width="30" Height="30" CornerRadius="8" Background="{StaticResource Surface2}" Margin="0,0,11,0">
+                    <TextBlock Text="{Binding Glyph}" Style="{StaticResource Icon}" FontSize="13" Foreground="{StaticResource Muted}"
+                               HorizontalAlignment="Center"/>
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding DateText}" FontSize="11.5" Foreground="{StaticResource Muted}" Margin="0,1,0,0"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Kleine Kennzahl im Übersichtsbereich -->
+        <Style x:Key="StatLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource Muted}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+        <Style x:Key="StatValue" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="240"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===================== Titelbild ===================== -->
+        <Grid ClipToBounds="True">
+            <Border Background="{StaticResource Surface}"/>
+            <Image Source="{Binding HeroImage}" Stretch="UniformToFill" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.3">
+                <Image.RenderTransform>
+                    <ScaleTransform ScaleX="1.08" ScaleY="1.08"/>
+                </Image.RenderTransform>
+                <Image.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX" From="1.08" To="1" Duration="0:0:1.8">
+                                    <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY" From="1.08" To="1" Duration="0:0:1.8">
+                                    <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Image.Triggers>
+            </Image>
+            <Border>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#E60E0E10" Offset="0"/>
+                        <GradientStop Color="#660E0E10" Offset="0.45"/>
+                        <GradientStop Color="#1A0E0E10" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+            <Border>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#400E0E10" Offset="0"/>
+                        <GradientStop Color="#000E0E10" Offset="0.35"/>
+                        <GradientStop Color="#FF0E0E10" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+
+            <!-- Zurück -->
+            <Button Command="{Binding BackCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="32,22,0,0"
+                    Background="#B30E0E10" BorderBrush="#33FFFFFF" Padding="12,7" WindowChrome.IsHitTestVisibleInChrome="True">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE72B;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
+                    <TextBlock Text="Bibliothek" FontSize="12.5"/>
+                </StackPanel>
+            </Button>
+
+            <!-- Logo + Status -->
+            <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="40,0,40,22"
+                        core:Anim.FadeIn="True" core:Anim.Delay="120" core:Anim.Offset="20">
+                <Grid HorizontalAlignment="Left">
+                    <Image Source="{Binding LogoImage}" MaxHeight="88" MaxWidth="320" Stretch="Uniform" HorizontalAlignment="Left"/>
+                    <TextBlock Text="Euro Truck Simulator 2" FontSize="32">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource H1}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding LogoImage}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+
+                <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                    <!-- Spielstatus -->
+                    <Border CornerRadius="12" Padding="10,5" Margin="0,0,8,0">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#CC122219"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsGameRunning}" Value="True">
+                                        <Setter Property="Background" Value="#CC272010"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="7" Height="7" Margin="0,0,8,0" VerticalAlignment="Center">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="{StaticResource Success}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsGameRunning}" Value="True">
+                                                <Setter Property="Fill" Value="{StaticResource Warning}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <TextBlock FontSize="12">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="Spiel geschlossen"/>
+                                        <Setter Property="Foreground" Value="{StaticResource Success}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsGameRunning}" Value="True">
+                                                <Setter Property="Text" Value="Spiel läuft – vor dem Speichern beenden"/>
+                                                <Setter Property="Foreground" Value="{StaticResource Warning}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <Border CornerRadius="12" Padding="10,5" Background="#CC2B1910"
+                            Visibility="{Binding ShowCoaches, Converter={StaticResource BoolToVis}}">
+                        <TextBlock Text="Coaches-DLC erkannt" FontSize="12" Foreground="{StaticResource Accent}"/>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <!-- ===================== Inhalt ===================== -->
+        <Grid Grid.Row="1" Margin="40,6,40,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="28"/>
+                <ColumnDefinition Width="340"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ===== Links: Tabs ===== -->
+            <Grid>
+                <!-- Platzhalter, solange nichts geladen ist -->
+                <StackPanel VerticalAlignment="Top" Margin="0,40,0,0">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsLoaded}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <!-- Lade-Kreisel -->
+                        <Grid Width="20" Height="20" Margin="0,0,12,0" RenderTransformOrigin="0.5,0.5"
+                              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}">
+                            <Grid.RenderTransform>
+                                <RotateTransform/>
+                            </Grid.RenderTransform>
+                            <Ellipse Stroke="{StaticResource Surface3}" StrokeThickness="3"/>
+                            <Path Stroke="{StaticResource Accent}" StrokeThickness="3" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                  Data="M10,1.5 A8.5,8.5 0 0 1 18.5,10"/>
+                            <Grid.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.Angle" From="0" To="360" Duration="0:0:0.8"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Grid.Triggers>
+                        </Grid>
+                        <TextBlock FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="Kein Spielstand geladen"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                                            <Setter Property="Text" Value="Spielstand wird geladen …"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource Caption}" FontSize="13.5" Margin="0,6,0,0"
+                               Text="Wähle rechts ein Profil und einen Spielstand aus."/>
+                </StackPanel>
+
+                <TabControl Visibility="{Binding IsLoaded, Converter={StaticResource BoolToVis}}" Margin="0,14,0,0">
+
+                    <!-- ===== Spieler ===== -->
+                    <TabItem Header="Spieler">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="0,0,10,28">
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <TextBlock Text="Finanzen" Style="{StaticResource H2}"/>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                                                    <TextBlock Text="Kontostand" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="Geld auf deinem Firmenkonto in Euro" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{Binding MoneyError}" Foreground="{StaticResource Danger}" FontSize="12" Margin="0,4,0,0"
+                                                               Visibility="{Binding MoneyError, Converter={StaticResource TextToVis}}"/>
+                                                </StackPanel>
+                                                <TextBox Grid.Column="1" Width="220" Style="{StaticResource NumberBox}" Tag="€"
+                                                         Text="{Binding MoneyText, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource RowLast}">
+                                            <WrapPanel>
+                                                <Button Style="{StaticResource ChipButton}" Content="+ 100.000 €" Command="{Binding AddMoneyCommand}" CommandParameter="100000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="+ 1 Mio. €" Command="{Binding AddMoneyCommand}" CommandParameter="1000000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="+ 10 Mio. €" Command="{Binding AddMoneyCommand}" CommandParameter="10000000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="+ 100 Mio. €" Command="{Binding AddMoneyCommand}" CommandParameter="100000000"/>
+                                            </WrapPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <Grid>
+                                                <TextBlock Text="Erfahrung &amp; Level" Style="{StaticResource H2}" VerticalAlignment="Center"/>
+                                                <Border HorizontalAlignment="Right" Background="{StaticResource AccentSoft}" CornerRadius="12" Padding="10,3">
+                                                    <TextBlock Text="{Binding LevelDisplay}" Foreground="{StaticResource Accent}" FontWeight="SemiBold" FontSize="12.5"/>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                                                    <TextBlock Text="Erfahrungspunkte (XP)" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="Daraus berechnet das Spiel dein Level" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{Binding XpError}" Foreground="{StaticResource Danger}" FontSize="12" Margin="0,4,0,0"
+                                                               Visibility="{Binding XpError, Converter={StaticResource TextToVis}}"/>
+                                                </StackPanel>
+                                                <TextBox Grid.Column="1" Width="220" Style="{StaticResource NumberBox}" Tag="XP"
+                                                         Text="{Binding XpText, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <WrapPanel>
+                                                <Button Style="{StaticResource ChipButton}" Content="+ 10.000 XP" Command="{Binding AddXpCommand}" CommandParameter="10000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="+ 100.000 XP" Command="{Binding AddXpCommand}" CommandParameter="100000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="+ 1 Mio. XP" Command="{Binding AddXpCommand}" CommandParameter="1000000"/>
+                                            </WrapPanel>
+                                        </Border>
+                                        <Border Style="{StaticResource RowLast}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                                                    <TextBlock Text="Level direkt setzen" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="Trägt automatisch die passenden XP ein" Style="{StaticResource Caption}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                    <TextBox Width="134" Style="{StaticResource NumberBox}" Tag="Level"
+                                                             Text="{Binding LevelInput, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    <Button Style="{StaticResource SoftButton}" Content="Setzen" Command="{Binding SetLevelCommand}"
+                                                            Width="78" Margin="8,0,0,0"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- ===== Fähigkeiten ===== -->
+                    <TabItem Header="Fähigkeiten">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="0,0,10,28">
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <StackPanel>
+                                                <TextBlock Text="ADR-Gefahrgut" Style="{StaticResource H2}"/>
+                                                <TextBlock Text="Welche Gefahrgutklassen du transportieren darfst" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <ItemsControl ItemsSource="{Binding AdrClasses}" Margin="20,16,12,8">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <ToggleButton Style="{StaticResource Chip}" Content="{Binding Label}" IsChecked="{Binding IsOn}"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <Grid>
+                                                <StackPanel>
+                                                    <TextBlock Text="LKW-Fähigkeiten" Style="{StaticResource H2}"/>
+                                                    <TextBlock Text="Stufe 0 bis 6" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                                <Button Style="{StaticResource SmallButton}" Content="Alles auf Maximum" Command="{Binding MaxSkillsCommand}"
+                                                        HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <ItemsControl ItemsSource="{Binding Skills}" ItemTemplate="{StaticResource SkillRow}"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- ===== Firma & Fahrzeuge ===== -->
+                    <TabItem Header="Firma &amp; Fahrzeuge">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="0,0,10,28">
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <StackPanel>
+                                                <TextBlock Text="Aktionen" Style="{StaticResource H2}"/>
+                                                <TextBlock Text="Werden beim Speichern ausgeführt" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border Style="{StaticResource Row}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,24,0">
+                                                    <TextBlock Text="Alle LKW, Busse &amp; Anhänger reparieren" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="Setzt jeden Verschleiß und Schaden auf 0 %" Style="{StaticResource Caption}"/>
+                                                </StackPanel>
+                                                <CheckBox Grid.Column="1" IsChecked="{Binding RepairVehicles}"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,24,0">
+                                                    <TextBlock Text="Alle LKW &amp; Busse volltanken" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="Tank auf 100 %" Style="{StaticResource Caption}"/>
+                                                </StackPanel>
+                                                <CheckBox Grid.Column="1" IsChecked="{Binding RefuelTrucks}"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,24,0">
+                                                    <TextBlock Text="Alle Städte als besucht markieren" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="Damit kannst du überall Garagen kaufen" Style="{StaticResource Caption}"/>
+                                                </StackPanel>
+                                                <CheckBox Grid.Column="1" IsChecked="{Binding VisitCities}"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,24,0">
+                                                    <TextBlock Text="Eigene Garagen auf „Groß“ ausbauen" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="5 Stellplätze, vorhandene LKW und Fahrer bleiben erhalten" Style="{StaticResource Caption}"/>
+                                                </StackPanel>
+                                                <CheckBox Grid.Column="1" IsChecked="{Binding UpgradeGarages}"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource RowLast}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,24,0">
+                                                    <TextBlock Text="Alle Garagen kaufen" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="Kostenlos in jeder Stadt, jeweils groß mit 5 Stellplätzen" Style="{StaticResource Caption}"/>
+                                                </StackPanel>
+                                                <CheckBox Grid.Column="1" IsChecked="{Binding BuyAllGarages}"/>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- ===== Coaches (nur mit DLC) ===== -->
+                    <TabItem Header="Coaches" Visibility="{Binding ShowCoaches, Converter={StaticResource BoolToVis}}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="0,0,10,28">
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <Grid>
+                                                <StackPanel>
+                                                    <TextBlock Text="Bus-Erfahrung" Style="{StaticResource H2}"/>
+                                                    <TextBlock Text="Eigener Level-Zähler für Busse – getrennt vom LKW-Level" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                                <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="{StaticResource AccentSoft}"
+                                                        CornerRadius="12" Padding="10,3">
+                                                    <TextBlock Text="{Binding BusLevelDisplay}" Foreground="{StaticResource Accent}" FontWeight="SemiBold" FontSize="12.5"/>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                                                    <TextBlock Text="Bus-Erfahrungspunkte (XP)" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="Pro Bus-Level gibt es einen Bus-Skillpunkt" Style="{StaticResource Caption}"/>
+                                                    <TextBlock Text="{Binding BusXpError}" Foreground="{StaticResource Danger}" FontSize="12" Margin="0,4,0,0"
+                                                               Visibility="{Binding BusXpError, Converter={StaticResource TextToVis}}"/>
+                                                </StackPanel>
+                                                <TextBox Grid.Column="1" Width="220" Style="{StaticResource NumberBox}" Tag="XP"
+                                                         Text="{Binding BusXpText, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <WrapPanel>
+                                                <Button Style="{StaticResource ChipButton}" Content="+ 1.000 XP" Command="{Binding AddBusXpCommand}" CommandParameter="1000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="+ 10.000 XP" Command="{Binding AddBusXpCommand}" CommandParameter="10000"/>
+                                                <Button Style="{StaticResource ChipButton}" Content="+ 100.000 XP" Command="{Binding AddBusXpCommand}" CommandParameter="100000"/>
+                                            </WrapPanel>
+                                        </Border>
+                                        <Border Style="{StaticResource RowLast}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                                                    <TextBlock Text="Bus-Level direkt setzen" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="Trägt automatisch die passenden Bus-XP ein" Style="{StaticResource Caption}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                    <TextBox Width="134" Style="{StaticResource NumberBox}" Tag="Level"
+                                                             Text="{Binding BusLevelInput, UpdateSourceTrigger=PropertyChanged}"/>
+                                                    <Button Style="{StaticResource SoftButton}" Content="Setzen" Command="{Binding SetBusLevelCommand}"
+                                                            Width="78" Margin="8,0,0,0"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <Grid>
+                                                <StackPanel>
+                                                    <TextBlock Text="Bus-Fähigkeiten" Style="{StaticResource H2}"/>
+                                                    <TextBlock Text="Stufe 0 bis 3 – wie im Spiel" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                                <Button Style="{StaticResource SmallButton}" Content="Alles auf Maximum" Command="{Binding MaxBusSkillsCommand}"
+                                                        HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <ItemsControl ItemsSource="{Binding BusSkills}" ItemTemplate="{StaticResource SkillRow}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource Card}">
+                                    <Border Style="{StaticResource RowLast}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Margin="0,0,24,0">
+                                                <TextBlock Text="Alle Bushaltestellen entdecken" Style="{StaticResource RowTitle}"/>
+                                                <TextBlock Text="Busbahnhöfe und Haltestellen auf der Karte freischalten" Style="{StaticResource Caption}"/>
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" IsChecked="{Binding DiscoverBusStops}"/>
+                                        </Grid>
+                                    </Border>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- ===== Backups ===== -->
+                    <TabItem Header="Backups">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="0,0,10,28">
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <Grid>
+                                                <StackPanel>
+                                                    <TextBlock Text="Backups" Style="{StaticResource H2}"/>
+                                                    <TextBlock Text="Vor jedem Speichern automatisch – bis zu 25 pro Spielstand" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                                <Button Style="{StaticResource SmallButton}" Content="Ordner öffnen" Command="{Binding OpenBackupFolderCommand}"
+                                                        HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <TextBlock Text="Noch keine Backups für diesen Spielstand." Margin="20,18">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Backups.Count}" Value="0">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+
+                                        <ItemsControl ItemsSource="{Binding Backups}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Style="{StaticResource Row}" Padding="20,11">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Text="&#xE81C;" Style="{StaticResource Icon}" Foreground="{StaticResource Faint}" Margin="0,0,14,0"/>
+                                                            <TextBlock Grid.Column="1" Text="{Binding Display}" VerticalAlignment="Center" FontSize="13.5"/>
+                                                            <TextBlock Grid.Column="2" Text="{Binding SizeText}" Style="{StaticResource Caption}"
+                                                                       VerticalAlignment="Center" Margin="12,0,16,0"/>
+                                                            <Button Grid.Column="3" Content="Wiederherstellen" Padding="12,6" FontSize="12.5"
+                                                                    Command="{Binding DataContext.RestoreBackupCommand, ElementName=Root}"
+                                                                    CommandParameter="{Binding}"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+
+            <!-- ===== Rechts: Spielstand & Speichern ===== -->
+            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="0,14,0,28">
+                    <!-- Auswahl -->
+                    <Border Style="{StaticResource Card}" Padding="20">
+                        <StackPanel>
+                            <TextBlock Text="PROFIL" Style="{StaticResource Overline}"/>
+                            <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}"
+                                      ItemTemplate="{StaticResource ProfileItem}" MinHeight="54"/>
+                            <TextBlock Text="SPIELSTAND" Style="{StaticResource Overline}" Margin="0,16,0,8"/>
+                            <ComboBox ItemsSource="{Binding Saves}" SelectedItem="{Binding SelectedSave}"
+                                      ItemTemplate="{StaticResource SaveItem}" MinHeight="54"/>
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Style="{StaticResource SmallButton}" Command="{Binding RefreshCommand}" Height="34">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE72C;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Aktualisieren"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Grid.Column="2" Style="{StaticResource SmallButton}" Command="{Binding OpenSaveFolderCommand}" Height="34">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE838;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Ordner"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Speichern -->
+                    <Border Style="{StaticResource Card}" Padding="20">
+                        <StackPanel>
+                            <Button Command="{Binding SaveCommand}" Height="48" HorizontalAlignment="Stretch">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding JustSaved}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource Success}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource Success}"/>
+                                                <Setter Property="Foreground" Value="#0E0E10"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
+                                                Visibility="{Binding JustSaved, Converter={StaticResource InvBoolToVis}}">
+                                        <TextBlock Text="&#xE74E;" Style="{StaticResource Icon}" Margin="0,0,10,0"/>
+                                        <TextBlock Text="Änderungen speichern"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" core:Anim.Pop="True"
+                                                Visibility="{Binding JustSaved, Converter={StaticResource BoolToVis}}">
+                                        <TextBlock Text="&#xE73E;" Style="{StaticResource Icon}" FontWeight="Bold" Margin="0,0,10,0"/>
+                                        <TextBlock Text="Gespeichert"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                            <TextBlock Text="Vorher wird automatisch ein Backup erstellt." Style="{StaticResource Caption}" FontSize="12"
+                                       HorizontalAlignment="Center" Margin="0,10,0,0"/>
+
+                            <!-- Statusmeldung -->
+                            <Border CornerRadius="8" Padding="12,10" Margin="0,14,0,0" BorderThickness="1"
+                                    core:Anim.FadeIn="True" core:Anim.Offset="8"
+                                    Visibility="{Binding StatusText, Converter={StaticResource TextToVis}}">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="{StaticResource Surface2}"/>
+                                        <Setter Property="BorderBrush" Value="{StaticResource LineHover}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding StatusKind}" Value="Error">
+                                                <Setter Property="Background" Value="{StaticResource DangerSoft}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource Danger}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding StatusKind}" Value="Success">
+                                                <Setter Property="Background" Value="{StaticResource SuccessSoft}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource Success}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" FontSize="12.5"/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Übersicht -->
+                    <Border Style="{StaticResource Card}" Padding="20,18,20,8"
+                            Visibility="{Binding IsLoaded, Converter={StaticResource BoolToVis}}">
+                        <StackPanel>
+                            <TextBlock Text="ÜBERSICHT" Style="{StaticResource Overline}" Margin="0,0,0,14"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="LKW" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding TruckStat}" Style="{StaticResource StatValue}"/>
+                                <TextBlock Grid.Row="1" Text="Anhänger" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TrailerStat}" Style="{StaticResource StatValue}"/>
+                                <TextBlock Grid.Row="2" Text="Fahrer" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding DriverStat}" Style="{StaticResource StatValue}"/>
+                                <TextBlock Grid.Row="3" Text="Garagen" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding GarageStat}" Style="{StaticResource StatValue}"/>
+                                <TextBlock Grid.Row="4" Text="Besuchte Städte" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding CityStat}" Style="{StaticResource StatValue}"/>
+                            </Grid>
+
+                            <Grid Visibility="{Binding ShowCoaches, Converter={StaticResource BoolToVis}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/><RowDefinition/><RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Busse" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding BusStat}" Style="{StaticResource StatValue}"/>
+                                <TextBlock Grid.Row="1" Text="Linienfahrten" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding BusTripStat}" Style="{StaticResource StatValue}"/>
+                                <TextBlock Grid.Row="2" Text="Haltestellen entdeckt" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding BusStopStat}" Style="{StaticResource StatValue}"/>
+                            </Grid>
+
+                            <Border BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="0,12,0,0" Margin="0,4,0,0">
+                                <TextBlock Style="{StaticResource Caption}" FontSize="11.5" Margin="0,0,0,10">
+                                    <Run Text="Format:"/>
+                                    <Run Text="{Binding FormatLabel, Mode=OneWay}"/>
+                                </TextBlock>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Hinweise -->
+                    <Border Style="{StaticResource Card}" Padding="20" Background="Transparent">
+                        <StackPanel>
+                            <TextBlock Text="SO GEHT'S" Style="{StaticResource Overline}" Margin="0,0,0,10"/>
+                            <TextBlock Style="{StaticResource Caption}" FontSize="12.5" LineHeight="20">
+                                1. Spiel beenden oder ins Hauptmenü gehen<LineBreak/>
+                                2. Werte ändern und speichern<LineBreak/>
+                                3. Im Spiel über „Laden“ den Spielstand öffnen
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>
