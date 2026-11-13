@@ -98,6 +98,43 @@
             <Setter Property="Background" Value="{StaticResource Surface2}"/>
             <Setter Property="Margin" Value="0,0,14,0"/>
         </Style>
+
+        <!-- Flags drawn as vectors (Windows doesn't render flag emojis) -->
+        <Style x:Key="Flag" TargetType="Rectangle">
+            <Setter Property="Width" Value="38"/>
+            <Setter Property="Height" Value="27"/>
+            <Setter Property="RadiusX" Value="5"/>
+            <Setter Property="RadiusY" Value="5"/>
+            <Setter Property="Margin" Value="0,0,14,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Stroke" Value="#22FFFFFF"/>
+            <Setter Property="StrokeThickness" Value="1"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+        </Style>
+        <DrawingBrush x:Key="FlagUk" Stretch="Fill" ViewboxUnits="Absolute" Viewbox="0,0,60,30">
+            <DrawingBrush.Drawing>
+                <DrawingGroup>
+                    <GeometryDrawing Brush="#012169" Geometry="M0,0 H60 V30 H0 Z"/>
+                    <GeometryDrawing Geometry="M0,0 L60,30 M60,0 L0,30">
+                        <GeometryDrawing.Pen><Pen Brush="White" Thickness="6"/></GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Geometry="M0,0 L60,30 M60,0 L0,30">
+                        <GeometryDrawing.Pen><Pen Brush="#C8102E" Thickness="2"/></GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="White" Geometry="M25,0 H35 V30 H25 Z M0,10 H60 V20 H0 Z"/>
+                    <GeometryDrawing Brush="#C8102E" Geometry="M27,0 H33 V30 H27 Z M0,12 H60 V18 H0 Z"/>
+                </DrawingGroup>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
+        <DrawingBrush x:Key="FlagDe" Stretch="Fill" ViewboxUnits="Absolute" Viewbox="0,0,5,3">
+            <DrawingBrush.Drawing>
+                <DrawingGroup>
+                    <GeometryDrawing Brush="#000000" Geometry="M0,0 H5 V1 H0 Z"/>
+                    <GeometryDrawing Brush="#DD0000" Geometry="M0,1 H5 V2 H0 Z"/>
+                    <GeometryDrawing Brush="#FFCE00" Geometry="M0,2 H5 V3 H0 Z"/>
+                </DrawingGroup>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
     </UserControl.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -125,9 +162,7 @@
                         </Grid.ColumnDefinitions>
                         <RadioButton Style="{StaticResource LanguageCard}" GroupName="Lang" IsChecked="{Binding IsEnglish}">
                             <StackPanel Orientation="Horizontal">
-                                <Border Style="{StaticResource LangBadge}">
-                                    <TextBlock Text="EN" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
+                                <Rectangle Style="{StaticResource Flag}" Fill="{StaticResource FlagUk}"/>
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="English" FontWeight="SemiBold" FontSize="14"/>
                                     <TextBlock Text="Default" Style="{StaticResource Caption}" FontSize="12"/>
@@ -136,9 +171,7 @@
                         </RadioButton>
                         <RadioButton Grid.Column="2" Style="{StaticResource LanguageCard}" GroupName="Lang" IsChecked="{Binding IsGerman}">
                             <StackPanel Orientation="Horizontal">
-                                <Border Style="{StaticResource LangBadge}">
-                                    <TextBlock Text="DE" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
+                                <Rectangle Style="{StaticResource Flag}" Fill="{StaticResource FlagDe}"/>
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="Deutsch" FontWeight="SemiBold" FontSize="14"/>
                                     <TextBlock Text="German" Style="{StaticResource Caption}" FontSize="12"/>
