@@ -12,6 +12,7 @@
             <core:InverseBoolToVisibilityConverter x:Key="InvBoolToVis"/>
             <core:TextToVisibilityConverter x:Key="TextToVis"/>
             <core:InverseBoolConverter x:Key="InvBool"/>
+            <core:StateIsConverter x:Key="StateIs"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -27,7 +27,13 @@ public sealed class MainViewModel : ObservableObject
         Library = new LibraryViewModel(this);
         _currentView = Library;
         ShowLibraryCommand = new RelayCommand(ShowLibrary);
+
+        // Beim Start leise nach Updates suchen (nur installierte Version).
+        _ = Task.Run(async () => await Task.Delay(2500))
+            .ContinueWith(_ => Updater.CheckAsync(silent: true), TaskScheduler.FromCurrentSynchronizationContext());
     }
+
+    public Updater Updater { get; } = new();
 
     public ObservableCollection<GameCardViewModel> Games { get; } = new();
     public ObservableCollection<GameCardViewModel> Favorites { get; } = new();

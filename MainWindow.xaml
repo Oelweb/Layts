@@ -4,6 +4,7 @@
         xmlns:vm="clr-namespace:Layts.ViewModels"
         xmlns:views="clr-namespace:Layts.Views"
         xmlns:ets2="clr-namespace:Layts.Games.Ets2"
+        xmlns:core="clr-namespace:Layts.Core"
         Title="layts" Icon="Assets/layts.ico" Width="1320" Height="880" MinWidth="1080" MinHeight="680"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource Bg}" Foreground="{StaticResource Text}"
@@ -56,13 +57,124 @@
                                Visibility="{Binding HasFavorites, Converter={StaticResource InvBoolToVis}}"
                                Text="Markiere Spiele in der Bibliothek mit dem Stern."/>
 
-                    <!-- Unten -->
-                    <Border DockPanel.Dock="Bottom" Background="{StaticResource Surface}" CornerRadius="10" Padding="14,12">
-                        <StackPanel>
-                            <TextBlock Text="Nur für den Einzelspieler" FontSize="12" FontWeight="SemiBold"/>
-                            <TextBlock Text="Nicht in TruckersMP oder Convoy verwenden." Style="{StaticResource Caption}" FontSize="11.5" Margin="0,3,0,0"/>
-                        </StackPanel>
-                    </Border>
+                    <!-- Unten: Updates + Hinweis -->
+                    <StackPanel DockPanel.Dock="Bottom" DataContext="{Binding Updater}">
+
+                        <!-- Update verfügbar -->
+                        <Border CornerRadius="10" Padding="14" Margin="0,0,0,10" Background="{StaticResource AccentSoft}"
+                                BorderBrush="{StaticResource Accent}" BorderThickness="1"
+                                Visibility="{Binding HasUpdate, Converter={StaticResource BoolToVis}}" core:Anim.FadeIn="True">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE896;" Style="{StaticResource Icon}" Foreground="{StaticResource Accent}" Margin="0,0,9,0"
+                                               core:Anim.Pop="True"/>
+                                    <TextBlock Text="Update verfügbar" FontWeight="SemiBold" FontSize="13"/>
+                                </StackPanel>
+                                <TextBlock Style="{StaticResource Caption}" FontSize="12" Margin="0,4,0,12">
+                                    <Run Text="Version"/>
+                                    <Run Text="{Binding AvailableVersion, Mode=OneWay}" Foreground="{StaticResource Text}" FontWeight="SemiBold"/>
+                                    <Run Text="ist da."/>
+                                </TextBlock>
+                                <Button Style="{StaticResource PrimaryButton}" Command="{Binding UpdateCommand}" Height="34" FontSize="12.5"
+                                        Padding="0" HorizontalAlignment="Stretch" WindowChrome.IsHitTestVisibleInChrome="True">
+                                    <Button.Visibility>
+                                        <Binding Path="IsBusy" Converter="{StaticResource InvBoolToVis}"/>
+                                    </Button.Visibility>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE896;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Jetzt aktualisieren"/>
+                                    </StackPanel>
+                                </Button>
+                                <StackPanel Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}">
+                                    <ProgressBar Value="{Binding Progress, Mode=OneWay}"/>
+                                    <TextBlock Text="{Binding Message}" Style="{StaticResource Caption}" FontSize="11.5" Margin="0,8,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Version + Suchen -->
+                        <Grid Margin="6,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource Faint}">
+                                <Run Text="layts"/>
+                                <Run Text="{Binding CurrentVersion, Mode=OneWay, StringFormat=v{0}}"/>
+                            </TextBlock>
+                            <Button Grid.Column="1" Style="{StaticResource GhostButton}" Command="{Binding CheckCommand}"
+                                    Padding="8,5" FontSize="12" ToolTip="Nach Updates suchen">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE72C;" FontSize="11" Margin="0,0,6,0"
+                                               RenderTransformOrigin="0.5,0.5">
+                                        <TextBlock.RenderTransform>
+                                            <RotateTransform/>
+                                        </TextBlock.RenderTransform>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource Icon}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding State}" Value="Checking">
+                                                        <DataTrigger.EnterActions>
+                                                            <BeginStoryboard x:Name="Spin">
+                                                                <Storyboard RepeatBehavior="Forever">
+                                                                    <DoubleAnimation Storyboard.TargetProperty="RenderTransform.Angle"
+                                                                                     From="0" To="360" Duration="0:0:0.8"/>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </DataTrigger.EnterActions>
+                                                        <DataTrigger.ExitActions>
+                                                            <StopStoryboard BeginStoryboardName="Spin"/>
+                                                        </DataTrigger.ExitActions>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock Text="Updates suchen"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+
+                        <!-- Meldung (aktuell / nicht installiert / Fehler) -->
+                        <Border CornerRadius="8" Padding="10,8" Margin="0,2,0,8" core:Anim.FadeIn="True" core:Anim.Offset="6">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Setter Property="Background" Value="{StaticResource Surface}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding State}" Value="UpToDate">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Setter Property="Background" Value="{StaticResource SuccessSoft}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding State}" Value="NotInstalled">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding State}" Value="Error">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Setter Property="Background" Value="{StaticResource DangerSoft}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE73E;" Style="{StaticResource Icon}" FontSize="11" Foreground="{StaticResource Success}"
+                                               Margin="0,0,7,0" core:Anim.Pop="True"
+                                               Visibility="{Binding State, Converter={StaticResource StateIs}, ConverterParameter=UpToDate}"/>
+                                    <TextBlock Text="{Binding Message}" FontSize="11.5" TextWrapping="Wrap" MaxWidth="180"
+                                               Foreground="{StaticResource Muted}"/>
+                                </StackPanel>
+                                <Button Style="{StaticResource GhostButton}" Command="{Binding OpenReleasesCommand}" Padding="0,6,0,0"
+                                        HorizontalAlignment="Left" FontSize="11.5" Foreground="{StaticResource Accent}"
+                                        Visibility="{Binding State, Converter={StaticResource StateIs}, ConverterParameter=NotInstalled}">
+                                    <TextBlock Text="Installer herunterladen →"/>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="Nur für den Einzelspieler – nicht in TruckersMP oder Convoy verwenden."
+                                   Style="{StaticResource Caption}" FontSize="11" Foreground="{StaticResource Faint}" Margin="6,0,0,0"/>
+                    </StackPanel>
 
                     <ItemsControl ItemsSource="{Binding Favorites}">
                         <ItemsControl.ItemTemplate>

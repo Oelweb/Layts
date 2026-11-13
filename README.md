@@ -28,6 +28,26 @@ Liest verschlüsselte, binäre (BSII) und Text-Spielstände. Alles, was nicht be
 > ⚠️ Nur für den Einzelspieler. Nicht mit TruckersMP oder Convoy verwenden.
 > Vor dem Speichern das Spiel beenden und den Spielstand danach im Spiel über „Laden“ öffnen.
 
+## Installieren & Updates
+
+**[`Layts-win-Setup.exe` aus den Releases](https://github.com/Oelweb/Layts/releases/latest)** herunterladen und starten.
+Der Installer richtet layts für deinen Benutzer ein (kein Admin nötig), legt Startmenü- und Desktop-Verknüpfung an
+und trägt sich unter *Einstellungen → Apps* zum Deinstallieren ein.
+
+Die installierte Version sucht beim Start automatisch nach Updates. Ist eins da, erscheint unten links
+**„Update verfügbar“** – ein Klick auf *Jetzt aktualisieren* lädt es herunter und startet layts neu.
+Manuell geht's über **„Updates suchen“**.
+
+## Release erstellen
+
+```powershell
+.\release.ps1 -Version 1.2.0           # nur lokal bauen (Ordner .\releases)
+.\release.ps1 -Version 1.2.0 -Upload   # bauen und als GitHub-Release veröffentlichen
+```
+
+Das Skript setzt die Version, baut die App und erstellt mit [Velopack](https://velopack.io) den Installer
+und die Update-Pakete. Benötigt einmalig: `dotnet tool install -g vpk`.
+
 ## Bauen
 
 Voraussetzung: [.NET 10 SDK](https://dotnet.microsoft.com/download)

@@ -1256,6 +1256,23 @@
         </Style.Triggers>
     </Style>
 
+    <!-- ===== Fortschrittsbalken (dünn, orange) ===== -->
+    <Style TargetType="ProgressBar">
+        <Setter Property="Height" Value="4"/>
+        <Setter Property="Minimum" Value="0"/>
+        <Setter Property="Maximum" Value="100"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ProgressBar">
+                    <Grid>
+                        <Border x:Name="PART_Track" CornerRadius="2" Background="{StaticResource Surface3}"/>
+                        <Border x:Name="PART_Indicator" CornerRadius="2" Background="{StaticResource Accent}" HorizontalAlignment="Left"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="ToolTip">
         <Setter Property="Background" Value="{StaticResource Surface3}"/>
         <Setter Property="Foreground" Value="{StaticResource Text}"/>
