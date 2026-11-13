@@ -1,5 +1,6 @@
 using Layts.Games.Ets2;
 using Layts.Games.Swyf;
+using Layts.Games.Thy;
 using Layts.ViewModels;
 
 namespace Layts.Games;
@@ -49,6 +50,16 @@ public static class GameCatalog
             SteamAppId = SwyfLocator.SteamAppId,
             FeatureKeys = new[] { "F_Money", "Sw_F_Day", "Sw_F_Quota", "Sw_F_Apps", "Sw_F_Emotes", "Sw_F_Settings", "F_Backups" },
             CreateViewModel = main => new SwyfViewModel(main),
+        },
+        new GameDefinition
+        {
+            Id = "thy",
+            Name = "Trees Hate You",
+            Short = "THY",
+            DescriptionKey = "ThyDesc",
+            SteamAppId = ThyLocator.SteamAppId,
+            FeatureKeys = new[] { "Thy_F_Levels", "Thy_F_Hats", "Thy_F_Skills", "Thy_F_Challenge", "F_Backups" },
+            CreateViewModel = main => new ThyViewModel(main),
         },
     };
 }

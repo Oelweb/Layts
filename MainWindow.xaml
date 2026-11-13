@@ -5,6 +5,7 @@
         xmlns:views="clr-namespace:Layts.Views"
         xmlns:ets2="clr-namespace:Layts.Games.Ets2"
         xmlns:swyf="clr-namespace:Layts.Games.Swyf"
+        xmlns:thy="clr-namespace:Layts.Games.Thy"
         xmlns:core="clr-namespace:Layts.Core"
         Title="layts" Icon="Assets/layts.ico" Width="1320" Height="880" MinWidth="1080" MinHeight="680"
         WindowStartupLocation="CenterScreen"
@@ -29,6 +30,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type swyf:SwyfViewModel}">
             <swyf:SwyfView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type thy:ThyViewModel}">
+            <thy:ThyView/>
         </DataTemplate>
     </Window.Resources>
 

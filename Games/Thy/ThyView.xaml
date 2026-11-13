@@ -1,0 +1,662 @@
+<UserControl x:Class="Layts.Games.Thy.ThyView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:core="clr-namespace:Layts.Core"
+             x:Name="Root">
+
+    <UserControl.Resources>
+        <!-- Hat / skill with a state menu -->
+        <DataTemplate x:Key="StateRow">
+            <Border Style="{StaticResource Row}" Padding="20,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Label}" Style="{StaticResource RowTitle}" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Column="1" Width="180" ItemsSource="{Binding Options}" SelectedIndex="{Binding State}"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <!-- Slot entry in the save menu -->
+        <DataTemplate x:Key="SlotItem">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Width="30" Height="30" CornerRadius="8" Background="{StaticResource Surface2}" Margin="0,0,11,0">
+                    <TextBlock Text="{Binding Glyph}" Style="{StaticResource Icon}" FontSize="13" Foreground="{StaticResource Muted}"
+                               HorizontalAlignment="Center"/>
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding DetailText}" FontSize="11.5" Foreground="{StaticResource Muted}" Margin="0,1,0,0"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <Style x:Key="StatLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource Muted}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+        <Style x:Key="StatValue" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="240"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===================== Hero ===================== -->
+        <Grid ClipToBounds="True">
+            <Border Background="{StaticResource Surface}"/>
+            <Image Source="{Binding HeroImage}" Stretch="UniformToFill" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.3">
+                <Image.RenderTransform>
+                    <ScaleTransform ScaleX="1.08" ScaleY="1.08"/>
+                </Image.RenderTransform>
+                <Image.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX" From="1.08" To="1" Duration="0:0:1.8">
+                                    <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY" From="1.08" To="1" Duration="0:0:1.8">
+                                    <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.6"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Image.Triggers>
+            </Image>
+            <Border>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#E60E0E10" Offset="0"/>
+                        <GradientStop Color="#660E0E10" Offset="0.45"/>
+                        <GradientStop Color="#1A0E0E10" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+            <Border>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#400E0E10" Offset="0"/>
+                        <GradientStop Color="#000E0E10" Offset="0.35"/>
+                        <GradientStop Color="#FF0E0E10" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+
+            <Button Command="{Binding BackCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="32,22,0,0"
+                    Background="#B30E0E10" BorderBrush="#33FFFFFF" Padding="12,7" WindowChrome.IsHitTestVisibleInChrome="True">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE72B;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
+                    <TextBlock Text="{core:Tr Library}" FontSize="12.5"/>
+                </StackPanel>
+            </Button>
+
+            <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="40,0,40,22"
+                        core:Anim.FadeIn="True" core:Anim.Delay="120" core:Anim.Offset="20">
+                <Grid HorizontalAlignment="Left">
+                    <Image Source="{Binding LogoImage}" MaxHeight="96" MaxWidth="320" Stretch="Uniform" HorizontalAlignment="Left"/>
+                    <TextBlock Text="Trees Hate You" FontSize="32">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource H1}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding LogoImage}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+
+                <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                    <Border CornerRadius="12" Padding="10,5" Margin="0,0,8,0">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#CC122219"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsGameRunning}" Value="True">
+                                        <Setter Property="Background" Value="#CC272010"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="7" Height="7" Margin="0,0,8,0" VerticalAlignment="Center">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="{StaticResource Success}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsGameRunning}" Value="True">
+                                                <Setter Property="Fill" Value="{StaticResource Warning}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <TextBlock FontSize="12">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="{core:Tr GameClosed}"/>
+                                        <Setter Property="Foreground" Value="{StaticResource Success}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsGameRunning}" Value="True">
+                                                <Setter Property="Text" Value="{core:Tr GameRunning}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource Warning}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                    <Border CornerRadius="12" Padding="10,5" Background="#CC2B1910">
+                        <TextBlock Text="{core:Tr Thy_DemoChip}" FontSize="12" Foreground="{StaticResource Accent}"/>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <!-- ===================== Content ===================== -->
+        <Grid Grid.Row="1" Margin="40,6,40,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="28"/>
+                <ColumnDefinition Width="340"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid>
+                <!-- Placeholder -->
+                <StackPanel VerticalAlignment="Top" Margin="0,40,0,0">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsLoaded}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock FontSize="16" FontWeight="SemiBold">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="{core:Tr NoSaveLoaded}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                                        <Setter Property="Text" Value="{core:Tr LoadingSave}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource Caption}" FontSize="13.5" Margin="0,6,0,0" Text="{core:Tr Sw_PickSlotHint}"/>
+                </StackPanel>
+
+                <TabControl Visibility="{Binding IsLoaded, Converter={StaticResource BoolToVis}}" Margin="0,14,0,0">
+
+                    <!-- ===== Progress ===== -->
+                    <TabItem Header="{core:Tr Thy_TabProgress}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="0,0,10,28">
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <StackPanel>
+                                                <TextBlock Text="{core:Tr Thy_Levels}" Style="{StaticResource H2}"/>
+                                                <TextBlock Text="{core:Tr Thy_LevelsDesc}" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                                                    <TextBlock Text="{core:Tr Thy_LevelReached}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr Thy_LevelReachedDesc}" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                    <ComboBox Width="200" ItemsSource="{Binding LevelOptions}" SelectedIndex="{Binding LevelIndex}"/>
+                                                    <Button Style="{StaticResource SoftButton}" Content="{core:Tr Thy_AllLevels}" Command="{Binding LastLevelCommand}"
+                                                            Margin="8,0,0,0" Padding="14,0"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource RowLast}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                                                    <TextBlock Text="{core:Tr Thy_Checkpoint}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr Thy_CheckpointDesc}" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <TextBox Grid.Column="1" Width="140" Style="{StaticResource NumberBox}" Tag="#"
+                                                         Text="{Binding CheckpointText, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <TextBlock Text="{core:Tr Thy_Challenge}" Style="{StaticResource H2}"/>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,24,0">
+                                                    <TextBlock Text="{core:Tr Thy_ChallengeUnlocked}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr Thy_ChallengeUnlockedDesc}" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <CheckBox Grid.Column="1" IsChecked="{Binding ChallengeUnlocked}"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource RowLast}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,24,0">
+                                                    <TextBlock Text="{core:Tr Thy_KaizoSave}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr Thy_KaizoSaveDesc}" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <CheckBox Grid.Column="1" IsChecked="{Binding Kaizo}"/>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <TextBlock Text="{core:Tr Thy_Collectibles}" Style="{StaticResource H2}"/>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <StackPanel>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                                                        <TextBlock Text="{core:Tr Thy_Coins}" Style="{StaticResource RowTitle}"/>
+                                                        <TextBlock Text="{core:Tr Thy_CoinsDesc}" Style="{StaticResource Caption}"/>
+                                                    </StackPanel>
+                                                    <TextBox Grid.Column="1" Width="140" Style="{StaticResource NumberBox}" Tag="{core:Tr Thy_CoinUnit}"
+                                                             Text="{Binding CoinText, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+                                                <WrapPanel Margin="0,12,0,0">
+                                                    <Button Style="{StaticResource ChipButton}" Content="+ 1" Command="{Binding AddCoinsCommand}" CommandParameter="1"/>
+                                                    <Button Style="{StaticResource ChipButton}" Content="+ 10" Command="{Binding AddCoinsCommand}" CommandParameter="10"/>
+                                                    <Button Style="{StaticResource ChipButton}" Content="+ 100" Command="{Binding AddCoinsCommand}" CommandParameter="100"/>
+                                                </WrapPanel>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <StackPanel>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                                                        <TextBlock Text="{core:Tr Thy_Acorns}" Style="{StaticResource RowTitle}"/>
+                                                        <TextBlock Text="{core:Tr Thy_AcornsDesc}" Style="{StaticResource Caption}"/>
+                                                    </StackPanel>
+                                                    <TextBox Grid.Column="1" Width="140" Style="{StaticResource NumberBox}" Tag="{core:Tr Thy_AcornUnit}"
+                                                             Text="{Binding AcornText, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+                                                <WrapPanel Margin="0,12,0,0">
+                                                    <Button Style="{StaticResource ChipButton}" Content="+ 1" Command="{Binding AddAcornsCommand}" CommandParameter="1"/>
+                                                    <Button Style="{StaticResource ChipButton}" Content="+ 10" Command="{Binding AddAcornsCommand}" CommandParameter="10"/>
+                                                    <Button Style="{StaticResource ChipButton}" Content="+ 100" Command="{Binding AddAcornsCommand}" CommandParameter="100"/>
+                                                </WrapPanel>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Style="{StaticResource RowLast}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,24,0">
+                                                    <TextBlock Text="{core:Tr Thy_EnoughAcorns}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr Thy_EnoughAcornsDesc}" Style="{StaticResource Caption}"/>
+                                                </StackPanel>
+                                                <CheckBox Grid.Column="1" IsChecked="{Binding EnoughAcorns}"/>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- ===== Hats ===== -->
+                    <TabItem Header="{core:Tr Thy_TabHats}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="0,0,10,28">
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <Grid>
+                                                <TextBlock Text="{core:Tr Thy_CurrentHat}" Style="{StaticResource H2}" VerticalAlignment="Center"/>
+                                                <ComboBox Width="200" HorizontalAlignment="Right" ItemsSource="{Binding HatOptions}" SelectedIndex="{Binding CurrentHatIndex}"/>
+                                            </Grid>
+                                        </Border>
+                                        <TextBlock Text="{core:Tr Thy_CurrentHatDesc}" Style="{StaticResource Caption}" Margin="20,12,20,14" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <Grid>
+                                                <StackPanel>
+                                                    <TextBlock Text="{core:Tr Thy_Hats}" Style="{StaticResource H2}"/>
+                                                    <TextBlock Text="{core:Tr Thy_HatsDesc}" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                    <Button Style="{StaticResource SmallButton}" Content="{core:Tr Sw_None}" Command="{Binding ResetHatsCommand}" Margin="0,0,8,0"/>
+                                                    <Button Style="{StaticResource SmallButton}" Content="{core:Tr Thy_FindAll}" Command="{Binding FindAllHatsCommand}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <ItemsControl ItemsSource="{Binding Hats}" ItemTemplate="{StaticResource StateRow}"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- ===== Skills ===== -->
+                    <TabItem Header="{core:Tr Thy_TabSkills}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="0,0,10,28">
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <Grid>
+                                                <StackPanel>
+                                                    <TextBlock Text="{core:Tr Thy_Skills}" Style="{StaticResource H2}"/>
+                                                    <TextBlock Text="{core:Tr Thy_SkillsDesc}" Style="{StaticResource Caption}" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                    <Button Style="{StaticResource SmallButton}" Content="{core:Tr Sw_UnlockAll}" Command="{Binding UnlockAllSkillsCommand}" Margin="0,0,8,0"/>
+                                                    <Button Style="{StaticResource SmallButton}" Content="{core:Tr Thy_ActivateAll}" Command="{Binding ActivateAllSkillsCommand}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <ItemsControl ItemsSource="{Binding Skills}" ItemTemplate="{StaticResource StateRow}"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- ===== Looks ===== -->
+                    <TabItem Header="{core:Tr Thy_TabLooks}" Visibility="{Binding HasEyeColor, Converter={StaticResource BoolToVis}}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="0,0,10,28">
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <StackPanel>
+                                                <TextBlock Text="{core:Tr Thy_Eyes}" Style="{StaticResource H2}"/>
+                                                <TextBlock Text="{core:Tr Thy_EyesDesc}" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Ellipse Width="40" Height="40" Fill="{Binding EyeBrush}" Stroke="{StaticResource Line}" StrokeThickness="2" Margin="0,0,16,0"/>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{core:Tr Thy_EyeColor}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{Binding EyeError}" Foreground="{StaticResource Danger}" FontSize="12"
+                                                               Visibility="{Binding EyeError, Converter={StaticResource TextToVis}}"/>
+                                                </StackPanel>
+                                                <TextBox Grid.Column="2" Width="140" Text="{Binding EyeText, UpdateSourceTrigger=PropertyChanged}" Tag="HEX"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource RowLast}">
+                                            <ItemsControl ItemsSource="{Binding EyePresets}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Button Command="{Binding DataContext.SetEyeCommand, ElementName=Root}" CommandParameter="{Binding}"
+                                                                Width="34" Height="34" Margin="0,0,10,0" Padding="0" Cursor="Hand" ToolTip="{Binding}">
+                                                            <Button.Template>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <Ellipse x:Name="Dot" Fill="{Binding}" Stroke="#33FFFFFF" StrokeThickness="2"/>
+                                                                    <ControlTemplate.Triggers>
+                                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                                            <Setter TargetName="Dot" Property="Stroke" Value="{StaticResource Text}"/>
+                                                                        </Trigger>
+                                                                    </ControlTemplate.Triggers>
+                                                                </ControlTemplate>
+                                                            </Button.Template>
+                                                        </Button>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- ===== Backups ===== -->
+                    <TabItem Header="{core:Tr TabBackups}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="0,0,10,28">
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <Grid>
+                                                <StackPanel>
+                                                    <TextBlock Text="{core:Tr TabBackups}" Style="{StaticResource H2}"/>
+                                                    <TextBlock Text="{core:Tr Thy_BackupsDesc}" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                                <Button Style="{StaticResource SmallButton}" Content="{core:Tr OpenFolder}" Command="{Binding OpenBackupFolderCommand}"
+                                                        HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <TextBlock Text="{core:Tr Sw_NoBackups}" Margin="20,18">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Backups.Count}" Value="0">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <ItemsControl ItemsSource="{Binding Backups}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Style="{StaticResource Row}" Padding="20,11">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Text="&#xE81C;" Style="{StaticResource Icon}" Foreground="{StaticResource Faint}" Margin="0,0,14,0"/>
+                                                            <TextBlock Grid.Column="1" Text="{Binding Display}" VerticalAlignment="Center" FontSize="13.5"/>
+                                                            <Button Grid.Column="2" Content="{core:Tr Restore}" Padding="12,6" FontSize="12.5"
+                                                                    Command="{Binding DataContext.RestoreBackupCommand, ElementName=Root}"
+                                                                    CommandParameter="{Binding}"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+
+            <!-- ===== Right: slot & save ===== -->
+            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="0,14,0,28">
+                    <Border Style="{StaticResource Card}" Padding="20">
+                        <StackPanel>
+                            <TextBlock Text="{core:Tr SaveHeader}" Style="{StaticResource Overline}"/>
+                            <ComboBox ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}"
+                                      ItemTemplate="{StaticResource SlotItem}" MinHeight="54"/>
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Style="{StaticResource SmallButton}" Command="{Binding RefreshCommand}" Height="34">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE72C;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
+                                        <TextBlock Text="{core:Tr Refresh}"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Grid.Column="2" Style="{StaticResource SmallButton}" Command="{Binding OpenSaveFolderCommand}" Height="34">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE838;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
+                                        <TextBlock Text="{core:Tr Folder}"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}" Padding="20">
+                        <StackPanel>
+                            <Button Command="{Binding SaveCommand}" Height="48" HorizontalAlignment="Stretch">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding JustSaved}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource Success}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource Success}"/>
+                                                <Setter Property="Foreground" Value="#0E0E10"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
+                                                Visibility="{Binding JustSaved, Converter={StaticResource InvBoolToVis}}">
+                                        <TextBlock Text="&#xE74E;" Style="{StaticResource Icon}" Margin="0,0,10,0"/>
+                                        <TextBlock Text="{core:Tr SaveChanges}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" core:Anim.Pop="True"
+                                                Visibility="{Binding JustSaved, Converter={StaticResource BoolToVis}}">
+                                        <TextBlock Text="&#xE73E;" Style="{StaticResource Icon}" FontWeight="Bold" Margin="0,0,10,0"/>
+                                        <TextBlock Text="{core:Tr Saved}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                            <TextBlock Text="{core:Tr BackupFirst}" Style="{StaticResource Caption}" FontSize="12"
+                                       HorizontalAlignment="Center" Margin="0,10,0,0"/>
+
+                            <Border CornerRadius="8" Padding="12,10" Margin="0,14,0,0" BorderThickness="1"
+                                    core:Anim.FadeIn="True" core:Anim.Offset="8"
+                                    Visibility="{Binding StatusText, Converter={StaticResource TextToVis}}">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="{StaticResource Surface2}"/>
+                                        <Setter Property="BorderBrush" Value="{StaticResource LineHover}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding StatusKind}" Value="Error">
+                                                <Setter Property="Background" Value="{StaticResource DangerSoft}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource Danger}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding StatusKind}" Value="Success">
+                                                <Setter Property="Background" Value="{StaticResource SuccessSoft}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource Success}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" FontSize="12.5"/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}" Padding="20,18,20,8"
+                            Visibility="{Binding IsLoaded, Converter={StaticResource BoolToVis}}">
+                        <StackPanel>
+                            <TextBlock Text="{core:Tr Overview}" Style="{StaticResource Overline}" Margin="0,0,0,14"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="{core:Tr Thy_Level}" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding LevelStat}" Style="{StaticResource StatValue}"/>
+                                <TextBlock Grid.Row="1" Text="{core:Tr Thy_Hats}" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding HatStat}" Style="{StaticResource StatValue}"/>
+                                <TextBlock Grid.Row="2" Text="{core:Tr Thy_Skills}" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SkillStat}" Style="{StaticResource StatValue}"/>
+                                <TextBlock Grid.Row="3" Text="{core:Tr Thy_CoinsPicked}" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CoinStat}" Style="{StaticResource StatValue}"/>
+                                <TextBlock Grid.Row="4" Text="{core:Tr Thy_Axes}" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding AxeStat}" Style="{StaticResource StatValue}"/>
+                                <TextBlock Grid.Row="5" Text="{core:Tr Thy_Gates}" Style="{StaticResource StatLabel}"/>
+                                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding GateStat}" Style="{StaticResource StatValue}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}" Padding="20" Background="Transparent">
+                        <StackPanel>
+                            <TextBlock Text="{core:Tr HowTo}" Style="{StaticResource Overline}" Margin="0,0,0,10"/>
+                            <TextBlock Text="{core:Tr Sw_HowTo1}" Style="{StaticResource Caption}" FontSize="12.5" Margin="0,0,0,4" TextWrapping="Wrap"/>
+                            <TextBlock Text="{core:Tr HowTo2}" Style="{StaticResource Caption}" FontSize="12.5" Margin="0,0,0,4"/>
+                            <TextBlock Text="{core:Tr Thy_HowTo3}" Style="{StaticResource Caption}" FontSize="12.5" Margin="0,0,0,12" TextWrapping="Wrap"/>
+                            <TextBlock Text="{core:Tr Thy_Note}" Style="{StaticResource Caption}" FontSize="12" TextWrapping="Wrap"
+                                       Foreground="{StaticResource Faint}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -38,6 +38,16 @@ Reads encrypted, binary (BSII) and text saves. Everything you don't edit stays b
 - Game settings: FOV, FPS limit, mouse sensitivity, volumes, toggle sprint, hide UI
 - Automatic backup of all slots and settings before every save, one-click restore
 
+**Trees Hate You** (Demo)
+- Level reached (unlock all levels) and checkpoint
+- Unlock Challenge Mode, turn a save into a Challenge run
+- Coins, acorns, "enough acorns found"
+- Hats: found / not found / lost, worn hat
+- Skills: locked / unlocked / active
+- Eye colour
+- Times and deaths are never touched, so speedrun times stay fair
+- Automatic backup before every save, one-click restore
+
 > ⚠️ Single player and private sessions only. Do not use with TruckersMP, Convoy or in public lobbies.
 > Close the game before saving.
 
@@ -81,6 +91,7 @@ Result: `publish/Layts.exe` – a single file that runs without .NET installed.
 | `Games/GameCatalog.cs` | List of games – a new game = new entry + folder under `Games/` |
 | `Games/Ets2` | ETS2 editor (logic, backups, UI) |
 | `Games/Swyf` | Scam With Your Friends editor |
+| `Games/Thy` | Trees Hate You editor |
 | `Themes/Dark.xaml` | Design (colors, controls, animations) |
 | `Views`, `ViewModels` | Library, settings and main window |
 
