@@ -29,8 +29,17 @@
 
 Reads encrypted, binary (BSII) and text saves. Everything you don't edit stays byte-for-byte identical.
 
-> ⚠️ Single player only. Do not use with TruckersMP or Convoy.
-> Close the game before saving, then open the save in-game via "Load".
+**Scam With Your Friends** (Early Access)
+- Money for every player in the run
+- Continue the run from any day, change the shift length
+- Quota: starting quota, per extra player, daily increase – with "Easy" and "Default" presets
+- Unlock or lock all scams and apps from the KolkataOS store (list is read from your game install, so it stays up to date)
+- Unlock all emotes, Mr. Curry suit
+- Game settings: FOV, FPS limit, mouse sensitivity, volumes, toggle sprint, hide UI
+- Automatic backup of all slots and settings before every save, one-click restore
+
+> ⚠️ Single player and private sessions only. Do not use with TruckersMP, Convoy or in public lobbies.
+> Close the game before saving.
 
 ## Install & updates
 
@@ -71,6 +80,7 @@ Result: `publish/Layts.exe` – a single file that runs without .NET installed.
 | `Core/Strings.cs` | All texts in English and German – new language = new column |
 | `Games/GameCatalog.cs` | List of games – a new game = new entry + folder under `Games/` |
 | `Games/Ets2` | ETS2 editor (logic, backups, UI) |
+| `Games/Swyf` | Scam With Your Friends editor |
 | `Themes/Dark.xaml` | Design (colors, controls, animations) |
 | `Views`, `ViewModels` | Library, settings and main window |
 

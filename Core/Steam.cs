@@ -126,6 +126,13 @@ public static class SteamArt
 
             var nested = Directory.EnumerateFiles(dir, file, SearchOption.AllDirectories).FirstOrDefault();
             if (nested != null) return nested;
+
+            // Newer Steam clients name the portrait cover "library_capsule.jpg".
+            if (file == Cover)
+            {
+                var capsule = Directory.EnumerateFiles(dir, "library_capsule.jpg", SearchOption.AllDirectories).FirstOrDefault();
+                if (capsule != null) return capsule;
+            }
         }
         return null;
     }

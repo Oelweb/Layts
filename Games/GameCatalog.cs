@@ -1,4 +1,5 @@
 using Layts.Games.Ets2;
+using Layts.Games.Swyf;
 using Layts.ViewModels;
 
 namespace Layts.Games;
@@ -38,6 +39,16 @@ public static class GameCatalog
             SteamAppId = Ets2Locator.SteamAppId,
             FeatureKeys = new[] { "F_Money", "F_Level", "F_Skills", "F_Garages", "F_Vehicles", "F_Coaches", "F_Backups" },
             CreateViewModel = main => new Ets2ViewModel(main),
+        },
+        new GameDefinition
+        {
+            Id = "swyf",
+            Name = "Scam With Your Friends",
+            Short = "SWYF",
+            DescriptionKey = "SwyfDesc",
+            SteamAppId = SwyfLocator.SteamAppId,
+            FeatureKeys = new[] { "F_Money", "Sw_F_Day", "Sw_F_Quota", "Sw_F_Apps", "Sw_F_Emotes", "Sw_F_Settings", "F_Backups" },
+            CreateViewModel = main => new SwyfViewModel(main),
         },
     };
 }
