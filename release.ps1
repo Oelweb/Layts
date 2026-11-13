@@ -45,8 +45,14 @@ if ($LASTEXITCODE -ne 0) { throw 'Build fehlgeschlagen.' }
 # GitHub-Token aus der Git-Anmeldung holen (wird nicht angezeigt)
 $token = $null
 if ($Upload) {
-    $cred = "protocol=https`nhost=github.com`n`n" | git credential fill
-    $token = ($cred | Where-Object { $_ -like 'password=*' }) -replace '^password=', ''
+    # Anfrage als Datei (reine LF-Zeilen, ohne BOM) per cmd-Umleitung an Git geben –
+    # Windows PowerShell 5 setzt beim Pipen sonst eine Kodierungsmarke davor.
+    $req = Join-Path $env:TEMP "layts-cred-$PID.txt"
+    [System.IO.File]::WriteAllText($req, "protocol=https`nhost=github.com`n`n", (New-Object System.Text.UTF8Encoding $false))
+    try { $cred = cmd /c "git credential fill < `"$req`"" }
+    finally { Remove-Item $req -Force -ErrorAction SilentlyContinue }
+    $token = [string](($cred | Where-Object { $_ -like 'password=*' } | Select-Object -First 1) -replace '^password=', '')
+    $token = $token.Trim()
     if (-not $token) { throw 'Keine GitHub-Anmeldung gefunden.' }
 
     # Vorheriges Release holen, damit Velopack kleine Delta-Updates erzeugen kann
