@@ -8,7 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Layts</AssemblyName>
     <RootNamespace>Layts</RootNamespace>
-    <Version>1.5.0</Version>
+    <Version>1.6.0</Version>
     <StartupObject>Layts.Program</StartupObject>
     <Product>Layts</Product>
     <Description>Layts – Spielstand-Editor</Description>
