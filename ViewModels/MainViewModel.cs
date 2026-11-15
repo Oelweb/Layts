@@ -26,6 +26,7 @@ public sealed class MainViewModel : ObservableObject
         RebuildFavorites();
 
         Library = new LibraryViewModel(this);
+        WheelMapper.Instance.Configure(Settings.WheelMapperEnabled, Settings.WheelBindings);
         SettingsPage = new SettingsViewModel(this);
         _currentView = Library;
         ShowLibraryCommand = new RelayCommand(ShowLibrary);

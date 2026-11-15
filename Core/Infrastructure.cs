@@ -74,6 +74,11 @@ public sealed class AppSettings
     /// <summary>Game ids with automatic backups turned off.</summary>
     public List<string> BackupDisabledGames { get; set; } = new();
 
+    /// <summary>Turn steering wheel buttons into keyboard keys while layts is open.</summary>
+    public bool WheelMapperEnabled { get; set; }
+
+    public List<WheelBinding> WheelBindings { get; set; } = new();
+
     /// <summary>The settings instance the app uses (set by <see cref="Load"/>).</summary>
     public static AppSettings Current { get; private set; } = new();
 

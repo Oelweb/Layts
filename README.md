@@ -55,6 +55,7 @@ Reads encrypted, binary (BSII) and text saves. Everything you don't edit stays b
 - Repair and clean all buses
 - Driving aids (engine, gears, lights, doors, A/C, kneeling, wipers, breaks), autosave interval, depot start, AI buses, live events and more
 - Traffic, pedestrian and passenger density, ticket buy chance, how often passengers complain
+- **Wheel buttons → keyboard:** if only steering works with a wheel, layts reads its buttons, d-pad and pedals and presses the keyboard key you choose (searchable list, works in any game while layts is open)
 - Steering wheel: rotation range (270–1080°), speed-dependent steering, auto-center, force feedback strength
 - Volumes, field of view, camera sensitivity, number plates per bus model
 - Unreal saves are changed in place – everything else stays byte-for-byte identical

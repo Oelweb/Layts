@@ -575,6 +575,137 @@
                         </ScrollViewer>
                     </TabItem>
 
+                    <!-- ===== Wheel buttons ===== -->
+                    <TabItem Header="{core:Tr Wh_Tab}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" DataContext="{Binding Wheel}">
+                            <StackPanel Margin="0,0,10,28">
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <StackPanel>
+                                                <TextBlock Text="{core:Tr Wh_Title}" Style="{StaticResource H2}"/>
+                                                <TextBlock Text="{core:Tr Wh_Desc}" Style="{StaticResource Caption}" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,24,0">
+                                                    <TextBlock Text="{core:Tr Wh_Enabled}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{core:Tr Wh_EnabledDesc}" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <CheckBox Grid.Column="1" IsChecked="{Binding Enabled}"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border Style="{StaticResource RowLast}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,24,0">
+                                                    <TextBlock Text="{core:Tr Wh_Devices}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{Binding DevicesText}" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+                                                    <TextBlock Style="{StaticResource Caption}" Margin="0,4,0,0">
+                                                        <Run Text="{core:Tr Wh_Live}"/>
+                                                        <Run Text="{Binding LiveText, Mode=OneWay}" Foreground="{StaticResource Accent}" FontWeight="SemiBold"/>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                                <Button Grid.Column="1" Style="{StaticResource SmallButton}" Content="{core:Tr Refresh}" Command="{Binding RefreshDevicesCommand}" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox Style="{StaticResource SearchBox}" Tag="{core:Tr Wh_Search}" Margin="0,0,12,0"
+                                                         Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}"/>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                    <Button Style="{StaticResource SmallButton}" Content="{core:Tr Wh_Cancel}" Command="{Binding CancelCaptureCommand}" Margin="0,0,8,0"
+                                                            Visibility="{Binding IsCapturing, Converter={StaticResource BoolToVis}}"/>
+                                                    <Button Style="{StaticResource PrimaryButton}" Command="{Binding AddCommand}" Padding="16,0" Height="36">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="&#xE710;" Style="{StaticResource Icon}" FontSize="12" Margin="0,0,8,0"/>
+                                                            <TextBlock Text="{core:Tr Wh_Add}"/>
+                                                        </StackPanel>
+                                                    </Button>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <Border Background="{StaticResource AccentSoft}" Padding="20,10"
+                                                Visibility="{Binding Hint, Converter={StaticResource TextToVis}}">
+                                            <TextBlock Text="{Binding Hint}" Foreground="{StaticResource Accent}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                        </Border>
+                                        <TextBlock Text="{core:Tr Wh_Empty}" Style="{StaticResource Caption}" Margin="20,18" TextWrapping="Wrap"
+                                                   Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}"/>
+                                        <ItemsControl ItemsSource="{Binding View}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Style="{StaticResource Row}" Padding="20,10">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="150"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                                                                <TextBlock Text="{Binding InputText}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                                <TextBlock Text="{Binding DeviceName}" Style="{StaticResource Caption}" FontSize="11" TextTrimming="CharacterEllipsis"/>
+                                                            </StackPanel>
+                                                            <Grid Grid.Column="1" Margin="0,0,10,0">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
+                                                                <TextBox Style="{StaticResource SearchBox}" Tag="{core:Tr Wh_ActionHint}"
+                                                                         Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                <ComboBox Grid.Column="1" Width="44" Margin="6,0,0,0" ToolTip="{core:Tr Wh_Suggestions}"
+                                                                          ItemsSource="{Binding DataContext.Wheel.LabelSuggestions, ElementName=Root}"
+                                                                          SelectedItem="{Binding PickedSuggestion}"/>
+                                                            </Grid>
+                                                            <TextBox Grid.Column="2" Width="130" core:KeyCapture.Key="{Binding Key}" ToolTip="{core:Tr Wh_KeyTip}"
+                                                                     HorizontalContentAlignment="Center"/>
+                                                            <Button Grid.Column="3" Style="{StaticResource SmallButton}" Command="{Binding ReassignCommand}" Margin="8,0,0,0"
+                                                                    ToolTip="{core:Tr Wh_Reassign}" Padding="10,0">
+                                                                <TextBlock Text="&#xE7C9;" Style="{StaticResource Icon}" FontSize="12"/>
+                                                            </Button>
+                                                            <Button Grid.Column="4" Style="{StaticResource SmallButton}" Command="{Binding RemoveCommand}" Margin="6,0,0,0"
+                                                                    ToolTip="{core:Tr Wh_Remove}" Padding="10,0">
+                                                                <TextBlock Text="&#xE74D;" Style="{StaticResource Icon}" FontSize="12" Foreground="{StaticResource Danger}"/>
+                                                            </Button>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource Card}" Padding="20" Background="Transparent">
+                                    <StackPanel>
+                                        <TextBlock Text="{core:Tr HowTo}" Style="{StaticResource Overline}" Margin="0,0,0,10"/>
+                                        <TextBlock Text="{core:Tr Wh_How1}" Style="{StaticResource Caption}" FontSize="12.5" Margin="0,0,0,4" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{core:Tr Wh_How2}" Style="{StaticResource Caption}" FontSize="12.5" Margin="0,0,0,4" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{core:Tr Wh_How3}" Style="{StaticResource Caption}" FontSize="12.5" Margin="0,0,0,4" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{core:Tr Wh_How4}" Style="{StaticResource Caption}" FontSize="12.5" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
                     <!-- ===== Backups ===== -->
                     <TabItem Header="{core:Tr TabBackups}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">

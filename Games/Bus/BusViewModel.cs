@@ -197,8 +197,11 @@ public sealed class BusViewModel : ObservableObject, IDisposable
         _timer.Tick += (_, _) => IsGameRunning = BusLocator.IsGameRunning();
         _timer.Start();
 
+        Wheel = new BusWheelViewModel(main);
         LoadProfiles();
     }
+
+    public BusWheelViewModel Wheel { get; }
 
     // ---------- Images ----------
 
@@ -696,5 +699,9 @@ public sealed class BusViewModel : ObservableObject, IDisposable
         }
     }
 
-    public void Dispose() => _timer.Stop();
+    public void Dispose()
+    {
+        _timer.Stop();
+        Wheel.Dispose();
+    }
 }
