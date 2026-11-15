@@ -167,6 +167,10 @@ public sealed class BusViewModel : ObservableObject, IDisposable
         AllSatisfiedCommand = new RelayCommand(() => { foreach (var e in Employees.Where(e => e.HasSatisfaction)) e.Satisfaction = 100; });
         AllSimpleCommand = new RelayCommand(() => { foreach (var t in Simplifications) t.IsOn = true; });
         NoSimpleCommand = new RelayCommand(() => { foreach (var t in Simplifications) t.IsOn = false; });
+        SetWheelAngleCommand = new RelayCommand(p =>
+        {
+            if (p is string s) WheelAngleText = s;
+        });
         OpenSaveFolderCommand = new RelayCommand(() => OpenFolder(SelectedProfile?.FolderPath ?? BusLocator.ProfilesDirectory));
         OpenBackupFolderCommand = new RelayCommand(() => OpenFolder(SelectedProfile == null ? BusBackups.Root : BusBackups.DirectoryFor(SelectedProfile)));
         RestoreBackupCommand = new RelayCommand(async p =>
@@ -211,6 +215,8 @@ public sealed class BusViewModel : ObservableObject, IDisposable
     public ObservableCollection<BusSlider> CameraSliders { get; } = new();
     public ObservableCollection<BusToggle> Simplifications { get; } = new();
     public ObservableCollection<BusToggle> GameplayToggles { get; } = new();
+    public ObservableCollection<BusToggle> WheelToggles { get; } = new();
+    public ObservableCollection<BusSlider> WheelSliders { get; } = new();
     public ObservableCollection<BusPlate> Plates { get; } = new();
     public ObservableCollection<BackupEntry> Backups { get; } = new();
 
@@ -223,6 +229,7 @@ public sealed class BusViewModel : ObservableObject, IDisposable
     public ICommand AllSatisfiedCommand { get; }
     public ICommand AllSimpleCommand { get; }
     public ICommand NoSimpleCommand { get; }
+    public ICommand SetWheelAngleCommand { get; }
     public ICommand OpenSaveFolderCommand { get; }
     public ICommand OpenBackupFolderCommand { get; }
     public ICommand RestoreBackupCommand { get; }
@@ -285,6 +292,13 @@ public sealed class BusViewModel : ObservableObject, IDisposable
 
     public double Fov { get => _fov; set => Set(ref _fov, Math.Clamp(Math.Round(value), 50, 120)); }
     public string AutosaveText { get => _autosaveText; set => Set(ref _autosaveText, value); }
+
+    private string _wheelAngleText = "";
+    private bool _hasWheelAngle;
+
+    /// <summary>Rotation range of the real steering wheel in degrees (0 = the game decides).</summary>
+    public string WheelAngleText { get => _wheelAngleText; set => Set(ref _wheelAngleText, value); }
+    public bool HasWheelAngle { get => _hasWheelAngle; private set => Set(ref _hasWheelAngle, value); }
 
     public IReadOnlyList<string> CommentOptions => new[]
     {
@@ -405,6 +419,8 @@ public sealed class BusViewModel : ObservableObject, IDisposable
         CameraSliders.Clear();
         Simplifications.Clear();
         GameplayToggles.Clear();
+        WheelToggles.Clear();
+        WheelSliders.Clear();
         Plates.Clear();
         if (s != null)
         {
@@ -452,6 +468,20 @@ public sealed class BusViewModel : ObservableObject, IDisposable
             Toggle(GameplayToggles, "hide Steering Wheel", "Bus_HideWheel");
             Toggle(GameplayToggles, "use System Time", "Bus_SystemTime");
             Toggle(GameplayToggles, "use System Date", "Bus_SystemDate");
+
+            Toggle(WheelToggles, "speedDependentSteering", "Bus_SpeedSteer");
+            Toggle(WheelToggles, "autoCenterSteeringWheel", "Bus_AutoCenter");
+            Toggle(WheelToggles, "forceFeedbackEnabled", "Bus_FF");
+            Toggle(WheelToggles, "wheelDependentIndicator", "Bus_WheelIndicator");
+            Toggle(WheelToggles, "keepBrake", "Bus_KeepBrake");
+            Slider(WheelSliders, "steering Camera", "Bus_SteerCam", 0, 100, 100, " %");
+            Slider(WheelSliders, "genericEffectMultiplier", "Bus_FfGeneric", 0, 100, 100, " %");
+            Slider(WheelSliders, "springForceMultiplier", "Bus_FfSpring", 0, 100, 100, " %");
+            Slider(WheelSliders, "damperForceMultiplier", "Bus_FfDamper", 0, 100, 100, " %");
+            Slider(WheelSliders, "roadEffectMultiplier", "Bus_FfRoad", 0, 100, 100, " %");
+            Slider(WheelSliders, "collisionEffectMultiplier", "Bus_FfCollision", 0, 100, 100, " %");
+            HasWheelAngle = s.GetDouble("wheelMaxAngle") is not null;
+            WheelAngleText = ((long)(s.GetDouble("wheelMaxAngle") ?? 0)).ToString(CultureInfo.InvariantCulture);
 
             Fov = s.GetDouble("field Of View FOV") ?? 80;
             _initialFov = Fov;
@@ -504,6 +534,13 @@ public sealed class BusViewModel : ObservableObject, IDisposable
             return;
         }
 
+        int wheelAngle = 0;
+        if (HasSettings && HasWheelAngle && (!int.TryParse(WheelAngleText.Trim(), out wheelAngle) || wheelAngle < 0 || wheelAngle > 2520))
+        {
+            ShowStatus(StatusKind.Error, Loc.Get("Bus_Err_WheelAngle"));
+            return;
+        }
+
         if (BusLocator.IsGameRunning())
         {
             var answer = MessageBox.Show(Loc.Get("Bus_Msg_GameRunning"), Loc.Get("Msg_GameRunningTitle"),
@@ -518,8 +555,8 @@ public sealed class BusViewModel : ObservableObject, IDisposable
         float reputation = (float)Reputation;
         var staff = Employees.Select(e => (e.Employee, (float)e.Experience, (float)e.Satisfaction)).ToList();
         bool repair = RepairBuses, clean = CleanBuses;
-        var sliders = TrafficSliders.Concat(AudioSliders).Concat(CameraSliders).Select(x => (x.Key, x.Value / x.Scale)).ToList();
-        var toggles = Simplifications.Concat(GameplayToggles).Select(x => (x.Key, x.IsOn)).ToList();
+        var sliders = TrafficSliders.Concat(AudioSliders).Concat(CameraSliders).Concat(WheelSliders).Select(x => (x.Key, x.Value / x.Scale)).ToList();
+        var toggles = Simplifications.Concat(GameplayToggles).Concat(WheelToggles).Select(x => (x.Key, x.IsOn)).ToList();
         var plates = Plates.Select(p => (p.Index, p.Plate)).ToList();
         double fov = Fov;
         bool fovChanged = Math.Abs(fov - _initialFov) > 0.01;
@@ -559,6 +596,7 @@ public sealed class BusViewModel : ObservableObject, IDisposable
                     foreach (var (key, on) in toggles) changed |= settings.SetBool(key, on);
                     changed |= settings.SetDouble("field Of View FOV", fov);
                     changed |= settings.SetDouble("autosave Intervale", autosave);
+                    changed |= settings.SetDouble("wheelMaxAngle", wheelAngle);
                     if (settings.Root["vehicle Settings"] is JsonArray vehicles)
                         foreach (var (index, plate) in plates)
                             if (vehicles[index] is JsonObject v && (string?)v["license Plate"] != plate)

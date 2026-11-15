@@ -400,6 +400,43 @@
                                 <Border Style="{StaticResource Card}">
                                     <StackPanel>
                                         <Border Style="{StaticResource CardHeader}">
+                                            <StackPanel>
+                                                <TextBlock Text="{core:Tr Bus_Wheel}" Style="{StaticResource H2}"/>
+                                                <TextBlock Text="{core:Tr Bus_WheelDesc}" Style="{StaticResource Caption}" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}" Visibility="{Binding HasWheelAngle, Converter={StaticResource BoolToVis}}">
+                                            <StackPanel>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                                                        <TextBlock Text="{core:Tr Bus_WheelAngle}" Style="{StaticResource RowTitle}"/>
+                                                        <TextBlock Text="{core:Tr Bus_WheelAngleDesc}" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                    <TextBox Grid.Column="1" Width="140" Style="{StaticResource NumberBox}" Tag="°"
+                                                             Text="{Binding WheelAngleText, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+                                                <WrapPanel Margin="0,12,0,0">
+                                                    <Button Style="{StaticResource ChipButton}" Content="{core:Tr Bus_Auto}" Command="{Binding SetWheelAngleCommand}" CommandParameter="0"/>
+                                                    <Button Style="{StaticResource ChipButton}" Content="270°" Command="{Binding SetWheelAngleCommand}" CommandParameter="270"/>
+                                                    <Button Style="{StaticResource ChipButton}" Content="360°" Command="{Binding SetWheelAngleCommand}" CommandParameter="360"/>
+                                                    <Button Style="{StaticResource ChipButton}" Content="540°" Command="{Binding SetWheelAngleCommand}" CommandParameter="540"/>
+                                                    <Button Style="{StaticResource ChipButton}" Content="720°" Command="{Binding SetWheelAngleCommand}" CommandParameter="720"/>
+                                                    <Button Style="{StaticResource ChipButton}" Content="900°" Command="{Binding SetWheelAngleCommand}" CommandParameter="900"/>
+                                                    <Button Style="{StaticResource ChipButton}" Content="1080°" Command="{Binding SetWheelAngleCommand}" CommandParameter="1080"/>
+                                                </WrapPanel>
+                                            </StackPanel>
+                                        </Border>
+                                        <ItemsControl ItemsSource="{Binding WheelToggles}" ItemTemplate="{StaticResource ToggleRow}"/>
+                                        <ItemsControl ItemsSource="{Binding WheelSliders}" ItemTemplate="{StaticResource SliderRow}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
                                             <Grid>
                                                 <StackPanel>
                                                     <TextBlock Text="{core:Tr Bus_Simplify}" Style="{StaticResource H2}"/>
