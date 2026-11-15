@@ -6,6 +6,7 @@
         xmlns:ets2="clr-namespace:Layts.Games.Ets2"
         xmlns:swyf="clr-namespace:Layts.Games.Swyf"
         xmlns:thy="clr-namespace:Layts.Games.Thy"
+        xmlns:bus="clr-namespace:Layts.Games.Bus"
         xmlns:core="clr-namespace:Layts.Core"
         Title="layts" Icon="Assets/layts.ico" Width="1320" Height="880" MinWidth="1080" MinHeight="680"
         WindowStartupLocation="CenterScreen"
@@ -33,6 +34,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type thy:ThyViewModel}">
             <thy:ThyView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type bus:BusViewModel}">
+            <bus:BusView/>
         </DataTemplate>
     </Window.Resources>
 

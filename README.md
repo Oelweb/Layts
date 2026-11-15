@@ -49,6 +49,15 @@ Reads encrypted, binary (BSII) and text saves. Everything you don't edit stays b
 - Times and deaths are never touched, so speedrun times stay fair
 - Automatic backup before every save, one-click restore
 
+**The Bus** (career mode)
+- Company budget and reputation
+- Staff: experience and satisfaction per employee, max all / everyone happy
+- Repair and clean all buses
+- Driving aids (engine, gears, lights, doors, A/C, kneeling, wipers, breaks), autosave interval, depot start, AI buses, live events and more
+- Traffic, pedestrian and passenger density, ticket buy chance, how often passengers complain
+- Volumes, field of view, camera sensitivity, number plates per bus model
+- Unreal saves are changed in place – everything else stays byte-for-byte identical
+
 > ⚠️ Single player and private sessions only. Do not use with TruckersMP, Convoy or in public lobbies.
 > Close the game before saving.
 
@@ -93,6 +102,7 @@ Result: `publish/Layts.exe` – a single file that runs without .NET installed.
 | `Games/Ets2` | ETS2 editor (logic, backups, UI) |
 | `Games/Swyf` | Scam With Your Friends editor |
 | `Games/Thy` | Trees Hate You editor |
+| `Games/Bus` | The Bus editor (Unreal save reader) |
 | `Themes/Dark.xaml` | Design (colors, controls, animations) |
 | `Views`, `ViewModels` | Library, settings and main window |
 

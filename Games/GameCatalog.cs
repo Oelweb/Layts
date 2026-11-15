@@ -1,3 +1,4 @@
+using Layts.Games.Bus;
 using Layts.Games.Ets2;
 using Layts.Games.Swyf;
 using Layts.Games.Thy;
@@ -60,6 +61,16 @@ public static class GameCatalog
             SteamAppId = ThyLocator.SteamAppId,
             FeatureKeys = new[] { "Thy_F_Levels", "Thy_F_Hats", "Thy_F_Skills", "Thy_F_Challenge", "F_Backups" },
             CreateViewModel = main => new ThyViewModel(main),
+        },
+        new GameDefinition
+        {
+            Id = "thebus",
+            Name = "The Bus",
+            Short = "BUS",
+            DescriptionKey = "BusDesc",
+            SteamAppId = BusLocator.SteamAppId,
+            FeatureKeys = new[] { "Bus_F_Budget", "Bus_F_Reputation", "Bus_F_Staff", "Bus_F_Repair", "Bus_F_Settings", "F_Backups" },
+            CreateViewModel = main => new BusViewModel(main),
         },
     };
 }
