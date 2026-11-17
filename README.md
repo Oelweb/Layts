@@ -60,6 +60,16 @@ Reads encrypted, binary (BSII) and text saves. Everything you don't edit stays b
 - Volumes, field of view, camera sensitivity, number plates per bus model
 - Unreal saves are changed in place – everything else stays byte-for-byte identical
 
+**Marvel's Spider-Man Remastered**
+- Lists every story save (autosave and manual saves per slot) with completion and play time
+- Activate all police towers (reveals the whole map), show all landmarks on the map or mark them as photographed
+- Unlock New Game+
+- Save options: skip QTEs, hold instead of mashing, skip tower puzzles, combat camera assist, minimap, HUD and subtitle options, J. Jonah Jameson podcasts
+- Mouse sensitivity for camera and aiming, horizontal and vertical separately, invert per axis
+- PC settings the game keeps in the registry: mouse smoothing, English voices, vignette, bloom, lens flares, chromatic aberration, film grain, motion blur, sharpness
+- Insomniac DAT1 saves are changed in place – everything else stays byte-for-byte identical
+- Automatic backup of all saves before every save, one-click restore
+
 > ⚠️ Single player and private sessions only. Do not use with TruckersMP, Convoy or in public lobbies.
 > Close the game before saving.
 
@@ -105,6 +115,7 @@ Result: `publish/Layts.exe` – a single file that runs without .NET installed.
 | `Games/Swyf` | Scam With Your Friends editor |
 | `Games/Thy` | Trees Hate You editor |
 | `Games/Bus` | The Bus editor (Unreal save reader) |
+| `Games/Spm` | Marvel's Spider-Man Remastered editor (Insomniac DAT1 save reader) |
 | `Themes/Dark.xaml` | Design (colors, controls, animations) |
 | `Views`, `ViewModels` | Library, settings and main window |
 

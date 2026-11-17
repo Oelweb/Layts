@@ -1,5 +1,6 @@
 using Layts.Games.Bus;
 using Layts.Games.Ets2;
+using Layts.Games.Spm;
 using Layts.Games.Swyf;
 using Layts.Games.Thy;
 using Layts.ViewModels;
@@ -71,6 +72,16 @@ public static class GameCatalog
             SteamAppId = BusLocator.SteamAppId,
             FeatureKeys = new[] { "Bus_F_Budget", "Bus_F_Reputation", "Bus_F_Staff", "Bus_F_Repair", "Bus_F_Settings", "F_Backups" },
             CreateViewModel = main => new BusViewModel(main),
+        },
+        new GameDefinition
+        {
+            Id = "spiderman",
+            Name = "Marvel's Spider-Man Remastered",
+            Short = "MSM",
+            DescriptionKey = "SmDesc",
+            SteamAppId = SpmLocator.SteamAppId,
+            FeatureKeys = new[] { "Sm_F_Map", "Sm_F_Landmarks", "Sm_F_NewGamePlus", "Sm_F_Options", "Sm_F_Mouse", "F_Backups" },
+            CreateViewModel = main => new SpmViewModel(main),
         },
     };
 }
