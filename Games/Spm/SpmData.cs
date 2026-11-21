@@ -184,6 +184,87 @@ public sealed class SpmSave
 
     public int ChallengesDone => Challenges.Count(c => c["CompletedOnce"] is { } f && Dat.GetBool(f));
 
+    /// <summary>Ticks every Taskmaster challenge off (no medals or times are changed).</summary>
+    public void CompleteChallenges()
+    {
+        foreach (var c in Challenges)
+            if (c["CompletedOnce"] is { Type: SpmDat1.TBool } f) Dat.SetBool(f, true);
+    }
+
+    // ----- Progression (XP / level) -----
+
+    private const uint ProgressSection = 0x586E01A8;
+    private const uint ProgressTag = 0xF2D60B24;
+    private int? _progress;
+    private bool _progressSearched;
+
+    /// <summary>Start of the progression block, or null if the layout is unknown.</summary>
+    private int? Progress
+    {
+        get
+        {
+            if (_progressSearched) return _progress;
+            _progressSearched = true;
+            if (Dat.FindSection(ProgressSection) is { } s && s.Size > 0x21 &&
+                Dat.Data[s.Offset] == 9 && Dat.ReadU32(s.Offset + 5) == ProgressTag &&
+                Dat.ReadU32(s.Offset + 0x19) <= 60 && Dat.ReadU32(s.Offset + 0x1D) < 2000)
+                _progress = s.Offset;
+            return _progress;
+        }
+    }
+
+    public bool HasProgress => Progress != null;
+
+    /// <summary>Total XP collected so far.</summary>
+    public uint TotalXp
+    {
+        get => Progress is { } p ? Dat.ReadU32(p + 9) : 0;
+        set
+        {
+            if (Progress is { } p) Dat.WriteU32(p + 9, value);
+        }
+    }
+
+    /// <summary>Level as shown in the game (stored 0-based).</summary>
+    public int Level => Progress is { } p ? (int)Dat.ReadU32(p + 0x19) + 1 : 0;
+
+    // ----- Tokens / resources -----
+
+    private const uint InventorySection = 0x00D0A9DF;
+    private const uint InventoryTag = 0x494E5654; // "TVNI"
+    private const uint CurrencyType = 0xC69D8B53;
+
+    public static readonly (ulong Id, string Key)[] KnownTokens =
+    {
+        (0xA130AADD4519CEBAul, "Sm_T_Crime"),
+        (0x2FFBB94870F48CB7ul, "Sm_T_Base"),
+        (0x1D8599E39CF4577Bul, "Sm_T_Research"),
+        (0x7845373EFE686086ul, "Sm_T_Backpack"),
+    };
+
+    /// <summary>Currency entries of the inventory: item id and absolute offset of the count.</summary>
+    public List<(ulong Id, int CountOffset)> Tokens()
+    {
+        var list = new List<(ulong, int)>();
+        if (Dat.FindSection(InventorySection) is not { } s || s.Size < 16 || Dat.ReadU32(s.Offset + 8) != InventoryTag) return list;
+        int end = s.Offset + s.Size;
+        int count = (int)Dat.ReadU32(s.Offset + 12);
+        int p = s.Offset + 16;
+        for (int i = 0; i < count; i++)
+        {
+            if (p + 8 > end) return new List<(ulong, int)>();
+            uint type = Dat.ReadU32(p);
+            int len = (int)Dat.ReadU32(p + 4);
+            if (len < 0 || len > 512 || p + 8 + len > end) return new List<(ulong, int)>();
+            if (type == CurrencyType && len >= 21) list.Add((Dat.ReadU64(p + 9), p + 8 + 17));
+            p += 8 + len;
+        }
+        return list;
+    }
+
+    public uint GetCount(int countOffset) => Dat.ReadU32(countOffset);
+    public void SetCount(int countOffset, uint value) => Dat.WriteU32(countOffset, value);
+
     public void Save() => Dat.Save();
 }
 

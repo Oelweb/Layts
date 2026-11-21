@@ -62,6 +62,9 @@ Reads encrypted, binary (BSII) and text saves. Everything you don't edit stays b
 
 **Marvel's Spider-Man Remastered**
 - Lists every story save (autosave and manual saves per slot) with completion and play time
+- Total XP (the game levels you up, with skill points, the next time you earn XP)
+- Tokens: crime, base, research and backpack tokens by name, plus all other resources of the save
+- Tick off all Taskmaster challenges
 - Activate all police towers (reveals the whole map), show all landmarks on the map or mark them as photographed
 - Unlock New Game+
 - Save options: skip QTEs, hold instead of mashing, skip tower puzzles, combat camera assist, minimap, HUD and subtitle options, J. Jonah Jameson podcasts

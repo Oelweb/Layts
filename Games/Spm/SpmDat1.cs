@@ -50,6 +50,20 @@ public sealed class SpmDat1
     /// <summary>All top-level objects that could be read, in file order.</summary>
     public List<SpmObject> Objects { get; } = new();
 
+    /// <summary>Section table: (hash, offset, size).</summary>
+    public List<(uint Hash, int Offset, int Size)> Sections { get; } = new();
+
+    public (int Offset, int Size)? FindSection(uint hash)
+    {
+        foreach (var s in Sections)
+            if (s.Hash == hash) return (s.Offset, s.Size);
+        return null;
+    }
+
+    public uint ReadU32(int offset) => BinaryPrimitives.ReadUInt32LittleEndian(Data.AsSpan(offset));
+    public ulong ReadU64(int offset) => BinaryPrimitives.ReadUInt64LittleEndian(Data.AsSpan(offset));
+    public void WriteU32(int offset, uint value) => BinaryPrimitives.WriteUInt32LittleEndian(Data.AsSpan(offset), value);
+
     public static SpmDat1 Load(string path)
     {
         var data = File.ReadAllBytes(path);
@@ -65,6 +79,7 @@ public sealed class SpmDat1
             int offset = BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(16 + i * 12 + 4));
             int size = BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(16 + i * 12 + 8));
             if (offset < 0 || size <= 0 || offset + size > data.Length) continue;
+            file.Sections.Add((BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(16 + i * 12)), offset, size));
             file.ReadSection(offset, offset + size);
         }
         return file;

@@ -12,6 +12,26 @@ using Layts.ViewModels;
 
 namespace Layts.Games.Spm;
 
+public sealed class SpmTokenRow : ObservableObject
+{
+    private string _text;
+
+    public SpmTokenRow(string label, int offset, uint value, bool known)
+    {
+        Label = label;
+        Offset = offset;
+        Known = known;
+        _text = value.ToString(CultureInfo.InvariantCulture);
+        Original = value;
+    }
+
+    public string Label { get; }
+    public int Offset { get; }
+    public bool Known { get; }
+    public uint Original { get; }
+    public string Text { get => _text; set => Set(ref _text, value); }
+}
+
 public sealed class SpmViewModel : ObservableObject, IDisposable
 {
     private const string BackupGameId = "spiderman";
@@ -46,7 +66,8 @@ public sealed class SpmViewModel : ObservableObject, IDisposable
     private bool _isLoaded, _isBusy, _isGameRunning, _justSaved;
     private string _statusText = "";
     private StatusKind _statusKind;
-    private bool _newGamePlus, _activateTowers, _showLandmarks, _discoverLandmarks;
+    private bool _newGamePlus, _activateTowers, _showLandmarks, _discoverLandmarks, _completeChallenges;
+    private string _xpText = "";
     private string _percentStat = "–", _playStat = "–", _towerStat = "–", _landmarkStat = "–", _challengeStat = "–";
 
     public SpmViewModel(MainViewModel main)
@@ -60,6 +81,16 @@ public sealed class SpmViewModel : ObservableObject, IDisposable
         {
             foreach (var t in SlotOptions.Where(t => t.Key is "SkipQTEs" or "ButtonMashUseHold" or "SkipTowerPuzzle" or "CombatCameraRotationAssistEnabled"))
                 t.IsOn = true;
+        });
+        AddXpCommand = new RelayCommand(p =>
+        {
+            uint.TryParse(XpText?.Trim(), out var current);
+            long.TryParse(p as string, out var add);
+            XpText = Math.Clamp(current + add, 0, 9_999_999).ToString(CultureInfo.InvariantCulture);
+        });
+        TokensCommand = new RelayCommand(p =>
+        {
+            foreach (var t in Tokens.Where(t => t.Known)) t.Text = p as string ?? "0";
         });
         ResetMouseCommand = new RelayCommand(() =>
         {
@@ -111,12 +142,16 @@ public sealed class SpmViewModel : ObservableObject, IDisposable
     public ObservableCollection<BusToggle> PcToggles { get; } = new();
     public ObservableCollection<BusSlider> PcSliders { get; } = new();
     public ObservableCollection<BackupEntry> Backups { get; } = new();
+    public ObservableCollection<SpmTokenRow> Tokens { get; } = new();
+    public ObservableCollection<SpmTokenRow> OtherTokens { get; } = new();
 
     public ICommand BackCommand { get; }
     public ICommand RefreshCommand { get; }
     public ICommand SaveCommand { get; }
     public ICommand AllHelpsCommand { get; }
     public ICommand ResetMouseCommand { get; }
+    public ICommand AddXpCommand { get; }
+    public ICommand TokensCommand { get; }
     public ICommand OpenSaveFolderCommand { get; }
     public ICommand OpenBackupFolderCommand { get; }
     public ICommand RestoreBackupCommand { get; }
@@ -171,6 +206,16 @@ public sealed class SpmViewModel : ObservableObject, IDisposable
             if (Set(ref _discoverLandmarks, value) && value) ShowLandmarks = true;
         }
     }
+
+    public bool CompleteChallenges { get => _completeChallenges; set => Set(ref _completeChallenges, value); }
+    public bool HasChallenges { get; private set; }
+    public string ChallengeInfo { get; private set; } = "";
+
+    public bool HasProgress { get; private set; }
+    public string XpText { get => _xpText; set => Set(ref _xpText, value); }
+    public string LevelInfo { get; private set; } = "";
+    public bool HasTokens => Tokens.Count > 0;
+    public bool HasOtherTokens => OtherTokens.Count > 0;
 
     public bool HasTowers { get; private set; }
     public bool HasLandmarks { get; private set; }
@@ -267,6 +312,30 @@ public sealed class SpmViewModel : ObservableObject, IDisposable
         NewGamePlus = ngp == true || prefs?.GetBool(prefs.Root, "NewGamePlusUnlocked") == true;
         OnPropertyChanged(nameof(HasNewGamePlus));
 
+        HasProgress = save.HasProgress;
+        XpText = save.TotalXp.ToString(CultureInfo.InvariantCulture);
+        LevelInfo = Loc.F("Sm_LevelInfo", save.Level);
+        OnPropertyChanged(nameof(HasProgress));
+        OnPropertyChanged(nameof(LevelInfo));
+
+        Tokens.Clear();
+        OtherTokens.Clear();
+        int other = 0;
+        foreach (var (id, offset) in save.Tokens())
+        {
+            var known = SpmSave.KnownTokens.FirstOrDefault(k => k.Id == id);
+            if (known.Key != null) Tokens.Add(new SpmTokenRow(Loc.Get(known.Key), offset, save.GetCount(offset), true));
+            else OtherTokens.Add(new SpmTokenRow(Loc.F("Sm_T_Other", ++other), offset, save.GetCount(offset), false));
+        }
+        OnPropertyChanged(nameof(HasTokens));
+        OnPropertyChanged(nameof(HasOtherTokens));
+
+        CompleteChallenges = false;
+        HasChallenges = save.Challenges.Count > 0;
+        ChallengeInfo = Loc.F("Sm_ChallengeInfo", save.ChallengesDone, save.Challenges.Count);
+        OnPropertyChanged(nameof(HasChallenges));
+        OnPropertyChanged(nameof(ChallengeInfo));
+
         ActivateTowers = false;
         ShowLandmarks = false;
         DiscoverLandmarks = false;
@@ -346,6 +415,28 @@ public sealed class SpmViewModel : ObservableObject, IDisposable
             if (answer != MessageBoxResult.Yes) return;
         }
 
+        uint? xp = null;
+        if (HasProgress)
+        {
+            if (!uint.TryParse(XpText.Trim(), out var v) || v > 9_999_999)
+            {
+                ShowStatus(StatusKind.Error, Loc.Get("Sm_Err_Xp"));
+                return;
+            }
+            xp = v;
+        }
+        var tokens = new List<(int Offset, uint Value)>();
+        foreach (var t in Tokens.Concat(OtherTokens))
+        {
+            if (!uint.TryParse(t.Text.Trim(), out var v) || v > 9999)
+            {
+                ShowStatus(StatusKind.Error, Loc.Get("Sm_Err_Tokens"));
+                return;
+            }
+            if (v != t.Original) tokens.Add((t.Offset, v));
+        }
+        bool challenges = CompleteChallenges;
+
         var options = SlotOptions.Select(o => (o.Key, o.IsOn)).ToList();
         bool ngp = NewGamePlus, towers = ActivateTowers, show = ShowLandmarks, discover = DiscoverLandmarks;
         var mouse = MouseSliders.Select(s => (s.Key, (float)(s.Value / 100.0))).ToList();
@@ -366,6 +457,9 @@ public sealed class SpmViewModel : ObservableObject, IDisposable
                 if (HasNewGamePlus) save.SetOption("NewGamePlusUnlocked", ngp);
                 if (towers) save.ActivateTowers();
                 if (show || discover) save.RevealLandmarks(discover);
+                if (challenges) save.CompleteChallenges();
+                if (xp is { } x && x != save.TotalXp) save.TotalXp = x;
+                foreach (var (offset, value) in tokens) save.SetCount(offset, value);
                 save.Save();
 
                 if (prefs?.Root != null)

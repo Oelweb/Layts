@@ -22,6 +22,20 @@
             </Border>
         </DataTemplate>
 
+        <!-- Token with a number box -->
+        <DataTemplate x:Key="TokenRow">
+            <Border Style="{StaticResource Row}" Padding="20,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Label}" Style="{StaticResource RowTitle}" VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="1" Width="140" Style="{StaticResource NumberBox}" Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
         <!-- Setting with a slider -->
         <DataTemplate x:Key="SliderRow">
             <Border Style="{StaticResource Row}">
@@ -249,6 +263,84 @@
                     <TabItem Header="{core:Tr Sm_TabProgress}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="0,0,10,28">
+                                <Border Style="{StaticResource Card}" Visibility="{Binding HasProgress, Converter={StaticResource BoolToVis}}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <StackPanel>
+                                                <TextBlock Text="{core:Tr Sm_Xp}" Style="{StaticResource H2}"/>
+                                                <TextBlock Text="{Binding LevelInfo}" Style="{StaticResource Caption}" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Style="{StaticResource RowLast}">
+                                            <StackPanel>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
+                                                        <TextBlock Text="{core:Tr Sm_TotalXp}" Style="{StaticResource RowTitle}"/>
+                                                        <TextBlock Text="{core:Tr Sm_TotalXpDesc}" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                    <TextBox Grid.Column="1" Width="200" Style="{StaticResource NumberBox}" Tag="EP"
+                                                             Text="{Binding XpText, UpdateSourceTrigger=PropertyChanged}"/>
+                                                </Grid>
+                                                <WrapPanel Margin="0,12,0,0">
+                                                    <Button Style="{StaticResource ChipButton}" Content="+ 5.000" Command="{Binding AddXpCommand}" CommandParameter="5000"/>
+                                                    <Button Style="{StaticResource ChipButton}" Content="+ 25.000" Command="{Binding AddXpCommand}" CommandParameter="25000"/>
+                                                    <Button Style="{StaticResource ChipButton}" Content="+ 100.000" Command="{Binding AddXpCommand}" CommandParameter="100000"/>
+                                                </WrapPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource Card}" Visibility="{Binding HasTokens, Converter={StaticResource BoolToVis}}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <Grid>
+                                                <StackPanel Margin="0,0,200,0">
+                                                    <TextBlock Text="{core:Tr Sm_Tokens}" Style="{StaticResource H2}"/>
+                                                    <TextBlock Text="{core:Tr Sm_TokensDesc}" Style="{StaticResource Caption}" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                    <Button Style="{StaticResource SmallButton}" Content="{core:Tr Sm_Tokens50}" Command="{Binding TokensCommand}" CommandParameter="50" Margin="0,0,8,0"/>
+                                                    <Button Style="{StaticResource SmallButton}" Content="{core:Tr Sm_Tokens99}" Command="{Binding TokensCommand}" CommandParameter="99"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <ItemsControl ItemsSource="{Binding Tokens}" ItemTemplate="{StaticResource TokenRow}"/>
+                                        <Border Padding="20,12,20,4" Visibility="{Binding HasOtherTokens, Converter={StaticResource BoolToVis}}">
+                                            <StackPanel>
+                                                <TextBlock Text="{core:Tr Sm_OtherTokens}" Style="{StaticResource Overline}" Margin="0,0,0,2"/>
+                                                <TextBlock Text="{core:Tr Sm_OtherTokensDesc}" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <ItemsControl ItemsSource="{Binding OtherTokens}" ItemTemplate="{StaticResource TokenRow}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource Card}" Visibility="{Binding HasChallenges, Converter={StaticResource BoolToVis}}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource CardHeader}">
+                                            <TextBlock Text="{core:Tr Sm_Activities}" Style="{StaticResource H2}"/>
+                                        </Border>
+                                        <Border Style="{StaticResource RowLast}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,24,0">
+                                                    <TextBlock Text="{core:Tr Sm_CompleteChallenges}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{Binding ChallengeInfo}" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <CheckBox Grid.Column="1" IsChecked="{Binding CompleteChallenges}"/>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
                                 <Border Style="{StaticResource Card}">
                                     <StackPanel>
                                         <Border Style="{StaticResource CardHeader}">

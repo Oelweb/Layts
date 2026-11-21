@@ -80,7 +80,7 @@ public static class GameCatalog
             Short = "MSM",
             DescriptionKey = "SmDesc",
             SteamAppId = SpmLocator.SteamAppId,
-            FeatureKeys = new[] { "Sm_F_Map", "Sm_F_Landmarks", "Sm_F_NewGamePlus", "Sm_F_Options", "Sm_F_Mouse", "F_Backups" },
+            FeatureKeys = new[] { "Sm_F_Xp", "Sm_F_Map", "Sm_F_Landmarks", "Sm_F_NewGamePlus", "Sm_F_Options", "Sm_F_Mouse", "F_Backups" },
             CreateViewModel = main => new SpmViewModel(main),
         },
     };
