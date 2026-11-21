@@ -65,6 +65,7 @@ Reads encrypted, binary (BSII) and text saves. Everything you don't edit stays b
 - Total XP (the game levels you up, with skill points, the next time you earn XP)
 - Tokens: crime, base, research and backpack tokens by name, plus all other resources of the save
 - Tick off all Taskmaster challenges
+- Complete all activities at once – backpacks, pigeons, research stations, Black Cat stakeouts, bases, side missions … (experimental: the finished state is taken from a 100 % save; story missions stay untouched, rewards are not added)
 - Activate all police towers (reveals the whole map), show all landmarks on the map or mark them as photographed
 - Unlock New Game+
 - Save options: skip QTEs, hold instead of mashing, skip tower puzzles, combat camera assist, minimap, HUD and subtitle options, J. Jonah Jameson podcasts

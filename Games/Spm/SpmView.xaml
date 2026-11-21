@@ -323,7 +323,23 @@
                                 <Border Style="{StaticResource Card}" Visibility="{Binding HasChallenges, Converter={StaticResource BoolToVis}}">
                                     <StackPanel>
                                         <Border Style="{StaticResource CardHeader}">
-                                            <TextBlock Text="{core:Tr Sm_Activities}" Style="{StaticResource H2}"/>
+                                            <StackPanel>
+                                                <TextBlock Text="{core:Tr Sm_Activities}" Style="{StaticResource H2}"/>
+                                                <TextBlock Text="{core:Tr Sm_ActivitiesDesc}" Style="{StaticResource Caption}" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Style="{StaticResource Row}" Visibility="{Binding HasActivities, Converter={StaticResource BoolToVis}}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Margin="0,0,24,0">
+                                                    <TextBlock Text="{core:Tr Sm_CompleteActivities}" Style="{StaticResource RowTitle}"/>
+                                                    <TextBlock Text="{Binding ActivityInfo}" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <CheckBox Grid.Column="1" IsChecked="{Binding CompleteActivities}"/>
+                                            </Grid>
                                         </Border>
                                         <Border Style="{StaticResource RowLast}">
                                             <Grid>

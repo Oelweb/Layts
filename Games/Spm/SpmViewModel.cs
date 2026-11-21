@@ -66,7 +66,7 @@ public sealed class SpmViewModel : ObservableObject, IDisposable
     private bool _isLoaded, _isBusy, _isGameRunning, _justSaved;
     private string _statusText = "";
     private StatusKind _statusKind;
-    private bool _newGamePlus, _activateTowers, _showLandmarks, _discoverLandmarks, _completeChallenges;
+    private bool _newGamePlus, _activateTowers, _showLandmarks, _discoverLandmarks, _completeChallenges, _completeActivities;
     private string _xpText = "";
     private string _percentStat = "–", _playStat = "–", _towerStat = "–", _landmarkStat = "–", _challengeStat = "–";
 
@@ -208,6 +208,9 @@ public sealed class SpmViewModel : ObservableObject, IDisposable
     }
 
     public bool CompleteChallenges { get => _completeChallenges; set => Set(ref _completeChallenges, value); }
+    public bool CompleteActivities { get => _completeActivities; set => Set(ref _completeActivities, value); }
+    public bool HasActivities { get; private set; }
+    public string ActivityInfo { get; private set; } = "";
     public bool HasChallenges { get; private set; }
     public string ChallengeInfo { get; private set; } = "";
 
@@ -330,8 +333,14 @@ public sealed class SpmViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(HasTokens));
         OnPropertyChanged(nameof(HasOtherTokens));
 
+        CompleteActivities = false;
+        HasActivities = save.HasActivities;
+        ActivityInfo = Loc.F("Sm_ActivityInfo", save.ActivitiesDone, save.ActivitiesTotal);
+        OnPropertyChanged(nameof(HasActivities));
+        OnPropertyChanged(nameof(ActivityInfo));
+
         CompleteChallenges = false;
-        HasChallenges = save.Challenges.Count > 0;
+        HasChallenges = save.Challenges.Count > 0 || save.HasActivities;
         ChallengeInfo = Loc.F("Sm_ChallengeInfo", save.ChallengesDone, save.Challenges.Count);
         OnPropertyChanged(nameof(HasChallenges));
         OnPropertyChanged(nameof(ChallengeInfo));
@@ -435,7 +444,7 @@ public sealed class SpmViewModel : ObservableObject, IDisposable
             }
             if (v != t.Original) tokens.Add((t.Offset, v));
         }
-        bool challenges = CompleteChallenges;
+        bool challenges = CompleteChallenges, activities = CompleteActivities;
 
         var options = SlotOptions.Select(o => (o.Key, o.IsOn)).ToList();
         bool ngp = NewGamePlus, towers = ActivateTowers, show = ShowLandmarks, discover = DiscoverLandmarks;
@@ -458,6 +467,7 @@ public sealed class SpmViewModel : ObservableObject, IDisposable
                 if (towers) save.ActivateTowers();
                 if (show || discover) save.RevealLandmarks(discover);
                 if (challenges) save.CompleteChallenges();
+                if (activities) save.CompleteActivities();
                 if (xp is { } x && x != save.TotalXp) save.TotalXp = x;
                 foreach (var (offset, value) in tokens) save.SetCount(offset, value);
                 save.Save();

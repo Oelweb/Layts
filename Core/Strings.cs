@@ -565,6 +565,10 @@ public static class Strings
         ["Sm_Activities"] = ("Activities", "Aktivitäten"),
         ["Sm_CompleteChallenges"] = ("Tick off all Taskmaster challenges", "Alle Taskmaster-Herausforderungen abhaken"),
         ["Sm_ChallengeInfo"] = ("{0} of {1} done – without medals or challenge tokens", "{0} von {1} erledigt – ohne Medaillen und Herausforderungs-Tokens"),
+        ["Sm_ActivitiesDesc"] = ("Story missions stay untouched. Rewards (tokens, XP, suits) are not added – set them above.", "Story-Missionen bleiben unverändert. Belohnungen (Tokens, EP, Anzüge) gibt es dafür nicht – die oben selbst setzen."),
+        ["Sm_CompleteActivities"] = ("Complete all activities", "Alle Aktivitäten erledigen"),
+        ["Sm_ActivityInfo"] = ("{0} of {1} done – backpacks, pigeons, research stations, Black Cat stakeouts, bases, side missions … all at once (state taken from a 100 % save)", "{0} von {1} erledigt – Rucksäcke, Tauben, Forschungsstationen, Black-Cat-Überwachungen, Basen, Nebenmissionen … alles auf einmal (Zustand aus einem 100-%-Spielstand)"),
+        ["Sm_F_Activities"] = ("Complete all activities", "Alle Aktivitäten erledigen"),
         ["Sm_Err_Xp"] = ("Please enter XP as a whole number (0–9,999,999).", "Bitte EP als ganze Zahl eingeben (0–9.999.999)."),
         ["Sm_Err_Tokens"] = ("Please enter tokens as whole numbers (0–9999).", "Bitte Tokens als ganze Zahlen eingeben (0–9999)."),
         ["Sm_F_Xp"] = ("XP & tokens", "EP & Tokens"),
@@ -649,7 +653,7 @@ public static class Strings
         ["Sm_Challenges"] = ("Challenges", "Herausforderungen"),
         ["Sm_BackupsDesc"] = ("All saves and options of this Steam account", "Alle Spielstände und Optionen dieses Steam-Kontos"),
         ["Sm_HowTo3"] = ("3. Start Spider-Man and load the save", "3. Spider-Man starten und den Spielstand laden"),
-        ["Sm_Note"] = ("Single player only. Skills, story missions and collectibles like backpacks are not editable.", "Nur Einzelspieler. Fähigkeiten, Story-Missionen und Sammelobjekte wie Rucksäcke sind nicht bearbeitbar."),
+        ["Sm_Note"] = ("Single player only. Skills and story missions are not editable. \"Complete all activities\" is experimental – a backup is made first.", "Nur Einzelspieler. Fähigkeiten und Story-Missionen sind nicht bearbeitbar. „Alle Aktivitäten erledigen“ ist experimentell – vorher wird ein Backup gemacht."),
 
         // ---------- Wheel buttons → keys ----------
         ["Wh_Tab"] = ("Wheel buttons", "Lenkrad-Tasten"),

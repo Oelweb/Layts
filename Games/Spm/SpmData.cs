@@ -191,6 +191,55 @@ public sealed class SpmSave
             if (c["CompletedOnce"] is { Type: SpmDat1.TBool } f) Dat.SetBool(f, true);
     }
 
+    // ----- Activities (XFSM state machines: collectibles, side activities …) -----
+
+    private const uint ActivitySection = 0xEB364589;
+    private const uint XfsmTag = 0x4D534658; // "XFSM"
+
+    /// <summary>(count, table 1 start, table 2 start) or null if the layout is unknown.</summary>
+    private (int Count, int T1, int T2)? Activities
+    {
+        get
+        {
+            if (Dat.FindSection(ActivitySection) is not { } s || s.Size < 32 || Dat.ReadU32(s.Offset) != XfsmTag) return null;
+            int n = (int)Dat.ReadU32(s.Offset + 9);
+            int t1 = s.Offset + 13;
+            int t2 = t1 + n * 14 + 16;
+            if (n <= 0 || n > 4000 || t2 + 4 + n * 32 > s.Offset + s.Size || Dat.ReadU32(t2) != (uint)n) return null;
+            for (int i = 0; i < n; i++)
+                if (Dat.ReadU32(t1 + i * 14) != Dat.ReadU32(t2 + 4 + i * 32)) return null;
+            return (n, t1, t2 + 4);
+        }
+    }
+
+    public bool HasActivities => Activities != null;
+
+    public int ActivitiesDone => Activities is { } a ? Enumerable.Range(0, a.Count).Count(i => Dat.Data[a.T1 + i * 14 + 4] == 4) : 0;
+    public int ActivitiesTotal => Activities?.Count ?? 0;
+
+    /// <summary>
+    /// Puts every known activity that isn't finished yet into its finished state (as in a 100 % save).
+    /// Story missions are a separate list and stay untouched. Returns how many were changed.
+    /// </summary>
+    public int CompleteActivities()
+    {
+        if (Activities is not { } a) return 0;
+        var data = Convert.FromBase64String(SpmCompletedActivities.Data);
+        var done = new Dictionary<uint, int>();
+        for (int p = 0; p + 42 <= data.Length; p += 42) done[BitConverter.ToUInt32(data, p)] = p;
+
+        int changed = 0;
+        for (int i = 0; i < a.Count; i++)
+        {
+            int r1 = a.T1 + i * 14, r2 = a.T2 + i * 32;
+            if (Dat.Data[r1 + 4] == 4 || !done.TryGetValue(Dat.ReadU32(r1), out var p)) continue;
+            Array.Copy(data, p + 4, Dat.Data, r1 + 4, 10);
+            Array.Copy(data, p + 14, Dat.Data, r2 + 4, 28);
+            changed++;
+        }
+        return changed;
+    }
+
     // ----- Progression (XP / level) -----
 
     private const uint ProgressSection = 0x586E01A8;
